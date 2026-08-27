@@ -259,6 +259,7 @@
   <script>
     const DB_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
 
+    // المفتاح العام الصحيح لحسابك في EmailJS
     (function() {
       emailjs.init("Jx6Q-8LBQvPjVbbSH");
     })();
@@ -415,36 +416,48 @@
         time: "15 دقيقة"
       };
 
+      // تجربة الإرسال عبر معرف القالب المخصص أولاً ثم الافتراضي
       emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
         .then(() => {
-          btn.innerText = 'متابعة';
-          btn.disabled = false;
-          closeModal('authModal');
-          document.getElementById('targetEmailDisplay').innerText = email;
-          document.getElementById('enteredOtp').value = '';
-          openModal('otpModal');
-
-          let timeLeft = 60;
-          document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-          if (otpTimerInterval) clearInterval(otpTimerInterval);
-
-          otpTimerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-            if (timeLeft <= 0) {
-              clearInterval(otpTimerInterval);
-              alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
-              closeModal('otpModal');
-              currentOtpCode = "";
-            }
-          }, 1000);
+          onOtpSentSuccess(email, btn);
         })
-        .catch((error) => {
-          btn.innerText = 'متابعة';
-          btn.disabled = false;
-          alert('تعذر إرسال البريد. يرجى التأكد من كتابة البريد بشكل صحيح.');
-          console.error('EmailJS Error:', error);
+        .catch((err1) => {
+          emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
+            .then(() => {
+              onOtpSentSuccess(email, btn);
+            })
+            .catch((err2) => {
+              btn.innerText = 'متابعة';
+              btn.disabled = false;
+              let errorMsg = err2.text || err1.text || 'تأكد من إعدادات EmailJS أو صحة البريد.';
+              alert('فشل الإرسال: ' + errorMsg);
+              console.error('EmailJS Error Details:', err1, err2);
+            });
         });
+    }
+
+    function onOtpSentSuccess(email, btn) {
+      btn.innerText = 'متابعة';
+      btn.disabled = false;
+      closeModal('authModal');
+      document.getElementById('targetEmailDisplay').innerText = email;
+      document.getElementById('enteredOtp').value = '';
+      openModal('otpModal');
+
+      let timeLeft = 60;
+      document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+      if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+      otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+        if (timeLeft <= 0) {
+          clearInterval(otpTimerInterval);
+          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
+          closeModal('otpModal');
+          currentOtpCode = "";
+        }
+      }, 1000);
     }
 
     async function verifyOtp() {
