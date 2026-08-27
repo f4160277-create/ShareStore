@@ -409,12 +409,18 @@
       btn.disabled = true;
 
       const templateParams = {
+        to_email: email,
         email: email,
         passcode: currentOtpCode,
         time: "15 دقيقة"
       };
 
-      emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
+      // استخدام المعرف الدقيق للقالب والخدمة
+      emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
+        .catch(() => {
+          // محاولة بديلة في حال استخدام المعرف الافتراضي
+          return emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams);
+        })
         .then(() => {
           btn.innerText = 'متابعة';
           btn.disabled = false;
@@ -441,7 +447,7 @@
         .catch((error) => {
           btn.innerText = 'متابعة';
           btn.disabled = false;
-          alert('تعذر إرسال البريد، يرجى التأكد من كتابة البريد بشكل صحيح.');
+          alert('تعذر إرسال البريد. يرجى التأكد من كتابة البريد بشكل صحيح أو فحص مجلد الرسائل غير المرغوب فيها (Spam).');
           console.error('EmailJS Error:', error);
         });
     }
@@ -587,7 +593,6 @@
       list.forEach((p) => {
         let actionArea = '';
 
-        // إذا كان الزائر مسجل دخول، تظهر له أزرار التواصل
         if (currentUser) {
           const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
           const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
@@ -611,7 +616,6 @@
             </div>
           `;
         } else {
-          // إذا كان الزائر غير مسجل دخول
           actionArea = `
             <button class="btn-login-to-order" onclick="openModal('authModal')">
               🔒 سجل دخولك للطلب والتواصل
