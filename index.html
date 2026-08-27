@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شير ستور | SHARE STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root {
       --bg-dark: #0B0F19;
@@ -23,7 +24,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
     body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 60px; min-height: 100vh; }
 
-    /* Header */
     header {
       background-color: var(--card-bg);
       padding: 15px 20px;
@@ -37,10 +37,8 @@
     }
 
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.15rem; color: #fff; text-decoration: none; }
-    .brand span.icon { font-size: 1.4rem; color: var(--primary); }
     .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-    /* Buttons */
     .btn {
       padding: 8px 14px;
       border-radius: 8px;
@@ -52,18 +50,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
     }
     .btn-primary { background-color: var(--primary); color: white; }
     .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
     .btn-outline { background: transparent; border: 1px solid var(--primary); color: white; }
-    .btn-outline:hover { background: rgba(139, 92, 246, 0.1); }
     .btn-admin { background: #1E293B; border: 1px solid #334155; color: #F8FAFC; }
-    .btn-admin:hover { background: #334155; }
     .btn-danger { background-color: var(--danger); color: white; }
     .btn-success { background-color: var(--success); color: white; }
 
-    /* Main Container */
     .container { max-width: 950px; margin: 25px auto; padding: 0 15px; }
 
     .banner-alert {
@@ -74,7 +68,6 @@
       font-size: 0.85rem;
       color: #E2E8F0;
       margin-bottom: 20px;
-      line-height: 1.6;
     }
 
     .search-input {
@@ -87,11 +80,9 @@
       font-size: 0.95rem;
       outline: none;
       margin-bottom: 25px;
-      transition: 0.2s border;
     }
     .search-input:focus { border-color: var(--primary); }
 
-    /* Cards Grid */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px; }
     .card {
       background-color: var(--card-bg);
@@ -101,9 +92,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: 0.2s transform, 0.2s border;
     }
-    .card:hover { border-color: #475569; }
 
     .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
     .product-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
@@ -119,10 +108,8 @@
       font-size: 0.75rem;
       color: #94A3B8;
       margin-bottom: 12px;
-      line-height: 1.5;
     }
 
-    /* Action Buttons */
     .actions-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
     .action-link {
       flex: 1;
@@ -157,7 +144,6 @@
       cursor: pointer;
     }
 
-    /* Modals */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -191,9 +177,7 @@
       font-size: 0.9rem;
       outline: none;
     }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
 
-    /* Tables */
     table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
     th, td { padding: 12px 10px; border: 1px solid #334155; text-align: right; }
     th { background: #0B0F19; color: var(--primary); }
@@ -203,7 +187,7 @@
 
   <header>
     <a href="#" class="brand">
-      <span class="icon">♾️</span>
+      <span>♾️</span>
       <span>شير ستور | SHARE STORE</span>
     </a>
     <div class="header-actions" id="navArea"></div>
@@ -211,17 +195,17 @@
 
   <div class="container">
     <div class="banner-alert">
-      ⚠️ <strong>إخلاء مسؤولية:</strong> المنصة وسيط إعلاني مباشر. كافة التعاملات المالية وتسليم الخدمات تتم بين البائع والمشتري بشكل مباشر.
+      ⚠️ <strong>إخلاء مسؤولية:</strong> المنصة وسيط إعلاني مباشر. التعاملات المالية وتسليم الاشتراكات تتم مباشرة بين البائع والمشتري.
     </div>
 
-    <input type="text" id="searchBar" class="search-input" placeholder="ابحث عن اشتراك، لعبة، أو خدمة معينة..." oninput="onSearchChange()">
+    <input type="text" id="searchBar" class="search-input" placeholder="ابحث عن اشتراك، لعبة، أو خدمة..." oninput="onSearchChange()">
 
     <div class="products-grid" id="productsContainer">
       <div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:40px;">جاري تحميل العروض السحابية...</div>
     </div>
   </div>
 
-  <!-- نافذة الحساب والدخول -->
+  <!-- نافذة تسجيل الدخول / حساب جديد -->
   <div class="modal-overlay" id="authModal">
     <div class="modal-box">
       <h3 id="authTitle" style="margin-bottom: 18px; color: #fff;">تسجيل الدخول</h3>
@@ -229,7 +213,7 @@
         
         <div class="form-group" id="nameGroup" style="display: none;">
           <label>الاسم أو اسم المتجر *</label>
-          <input type="text" id="authNameInput" placeholder="مثال: متجر الرقميات">
+          <input type="text" id="authNameInput" placeholder="اسم الحساب">
         </div>
 
         <div class="form-group" id="phoneGroup" style="display: none;">
@@ -250,8 +234,8 @@
         <div class="form-group" id="roleGroup" style="display: none;">
           <label>نوع الحساب *</label>
           <select id="authRoleInput">
-            <option value="customer">عميل (تصفح وتواصل للشراء)</option>
-            <option value="seller">بائع (إضافة ونشر العروض والخدمات)</option>
+            <option value="customer">عميل (تصفح وشراء)</option>
+            <option value="seller">بائع (عرض ونشر خدمات)</option>
           </select>
         </div>
 
@@ -264,53 +248,70 @@
     </div>
   </div>
 
-  <!-- نافذة إضافة إعلان جديد -->
+  <!-- نافذة تأكيد رمز OTP -->
+  <div class="modal-overlay" id="otpModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 12px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
+      <p style="font-size: 0.85rem; color: #CBD5E1; margin-bottom: 15px;">
+        تم إرسال رمز التحقق إلى بريدك الإلكتروني: <br>
+        <strong id="targetMailDisplay" style="color: #34D399;"></strong>
+      </p>
+
+      <div class="form-group">
+        <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.4rem; letter-spacing:6px;" required>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:0.85rem;">
+        <span style="color:var(--text-muted);">الوقت المتبقي:</span>
+        <strong id="otpTimer" style="color:#EF4444; font-size:1rem;">60 ثانية</strong>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="verifyOtpCode()">تأكيد وتفعيل الحساب</button>
+        <button type="button" class="btn btn-admin" onclick="hideModal('otpModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة إعلان -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-box">
       <h3 style="margin-bottom: 18px; color: var(--primary);">+ نشر إعلان جديد</h3>
       <form onsubmit="submitNewProduct(event)">
         <div class="form-group">
-          <label>عنوان الخدمة / المنتج *</label>
-          <input type="text" id="prodTitle" required placeholder="مثال: يوتيوب بريميوم 12 شهر">
+          <label>اسم الخدمة / الاشتراك *</label>
+          <input type="text" id="prodTitle" required placeholder="مثال: يوتيوب بريميوم سنة">
         </div>
         <div class="form-group">
           <label>السعر *</label>
           <input type="text" id="prodPrice" required placeholder="مثال: 55 ريال">
         </div>
         <div class="form-group">
-          <label>رقم الواتساب للتواصل * (بالصيغة الدولية أو المحلية)</label>
+          <label>رقم الواتساب للتواصل *</label>
           <input type="text" id="prodWhatsapp" required placeholder="05xxxxxxxx أو 9665xxxxxxxx">
         </div>
         <div class="form-group">
-          <label>يوزر التيلجرام (اختياري)</label>
-          <input type="text" id="prodTelegram" placeholder="اسم المستخدم بدون @">
+          <label>يوزر تيليجرام (اختياري)</label>
+          <input type="text" id="prodTelegram" placeholder="username بدون @">
         </div>
         <div class="form-group">
-          <label>تفاصيل وشروط العرض والضمان *</label>
-          <textarea id="prodDesc" rows="3" required placeholder="اكتب تفاصيل الخدمة ومدة الضمان وطريقة التسليم..."></textarea>
+          <label>شروط وتفاصيل الخدمة *</label>
+          <textarea id="prodDesc" rows="3" required placeholder="شروط الضمان وطريقة التفعيل..."></textarea>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="submit" class="btn btn-primary" style="flex:1;" id="publishBtn">نشر الإعلان فوراً</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="publishBtn">نشر الإعلان</button>
           <button type="button" class="btn btn-admin" onclick="hideModal('addModal')">إلغاء</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- لوحة تحكم المسؤولين -->
+  <!-- لوحة الإدارة -->
   <div class="modal-overlay" id="adminModal">
     <div class="modal-box wide">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
         <h3 style="color: var(--primary);">⚙️ لوحة إدارة المستخدمين والحظر السحابي</h3>
         <button class="btn btn-danger" onclick="hideModal('adminModal')">✕ إغلاق</button>
-      </div>
-
-      <div id="addAdminContainer" style="display:none; background:#0B0F19; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
-        <h4 style="font-size:0.85rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (خاص بالمالك)</h4>
-        <div style="display:flex; gap:8px;">
-          <input type="email" id="newAdminMail" placeholder="البريد الإلكتروني للإداري" style="flex:1; padding:8px; background:#151F32; border:1px solid #334155; color:white; border-radius:6px;">
-          <button class="btn btn-primary" onclick="promoteNewAdmin()">إضافة</button>
-        </div>
       </div>
 
       <div style="overflow-x: auto;">
@@ -333,20 +334,23 @@
   </div>
 
   <script>
-    // الرابط السحابي المباشر
     const CLOUD_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
+    const OWNER_EMAIL = "erf8811@gmail.com";
+    const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
-    const PRIMARY_OWNER = "erf8811@gmail.com";
-    const DEPUTY_OWNER = "ftb7788@gmail.com";
+    // تهيئة EmailJS
+    emailjs.init({ publicKey: "Jx6Q-8LBQvPjVbbSH" });
 
-    let adminEmails = [PRIMARY_OWNER, DEPUTY_OWNER];
+    let adminEmails = [OWNER_EMAIL, DEPUTY_EMAIL];
     let loadedUsers = [];
     let loadedProducts = [];
 
     let activeUser = JSON.parse(localStorage.getItem('sharestore_user_session')) || null;
     let isRegisterTab = false;
+    let pendingUserData = null;
+    let generatedOtp = "";
+    let timerCountdown = null;
 
-    // جلب البيانات السحابية الشاملة
     async function syncCloudData() {
       try {
         const [prodRes, usersRes, adminRes] = await Promise.all([
@@ -378,21 +382,20 @@
 
         renderProductsList(loadedProducts);
       } catch (e) {
-        console.error("Sync Error:", e);
+        console.error("Cloud sync error:", e);
       }
     }
 
     function checkAdminStatus() {
       if (!activeUser || !activeUser.email) return false;
       const em = activeUser.email.toLowerCase();
-      return adminEmails.map(a => a.toLowerCase()).includes(em) || em === PRIMARY_OWNER || em === DEPUTY_OWNER;
+      return adminEmails.map(a => a.toLowerCase()).includes(em) || em === OWNER_EMAIL || em === DEPUTY_EMAIL;
     }
 
     function isOwnerUser() {
-      return activeUser && activeUser.email.toLowerCase() === PRIMARY_OWNER;
+      return activeUser && activeUser.email.toLowerCase() === OWNER_EMAIL;
     }
 
-    // تحديث شريط التنقل العلوي
     function refreshNavigation() {
       const nav = document.getElementById('navArea');
       if (activeUser) {
@@ -402,7 +405,7 @@
 
         let roleText = "عميل";
         if (isOwnerUser()) roleText = "المالك";
-        else if (activeUser.email.toLowerCase() === DEPUTY_OWNER) roleText = "نائب المالك";
+        else if (activeUser.email.toLowerCase() === DEPUTY_EMAIL) roleText = "نائب المالك";
         else if (activeUser.role === 'seller') roleText = "بائع";
 
         nav.innerHTML = `
@@ -425,26 +428,20 @@
       document.getElementById('phoneGroup').style.display = isRegisterTab ? 'block' : 'none';
       document.getElementById('roleGroup').style.display = isRegisterTab ? 'block' : 'none';
       document.getElementById('authToggleButton').innerText = isRegisterTab ? 'لدي حساب بالفعل' : 'حساب جديد';
-      document.getElementById('authSubmitButton').innerText = isRegisterTab ? 'تسجيل وتفعيل الحساب' : 'تسجيل الدخول';
+      document.getElementById('authSubmitButton').innerText = isRegisterTab ? 'إرسال رمز التحقق للإيميل' : 'تسجيل الدخول';
     }
 
-    // معالجة تسجيل الدخول / إنشاء حساب
     async function submitAuthForm(e) {
       e.preventDefault();
       const email = document.getElementById('authEmailInput').value.trim().toLowerCase();
       const pass = document.getElementById('authPassInput').value.trim();
       const btn = document.getElementById('authSubmitButton');
 
-      btn.disabled = true;
-      btn.innerText = 'جاري المعالجة...';
-
       await syncCloudData();
 
       if (isRegisterTab) {
         if (loadedUsers.find(u => u.email && u.email.toLowerCase() === email)) {
           alert('البريد الإلكتروني مسجل مسبقاً! يرجى تسجيل الدخول.');
-          btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب';
           return;
         }
 
@@ -453,67 +450,72 @@
         const role = document.getElementById('authRoleInput').value;
 
         if (!name || !phone) {
-          alert('يرجى ملء كافة الحقول المطلوبة.');
-          btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب';
+          alert('يرجى ملء كافة الحقول.');
           return;
         }
 
-        const newAccount = {
-          name,
-          phone,
-          email,
-          pass,
-          role,
-          banned: false,
-          date: new Date().toLocaleDateString('ar-SA')
+        pendingUserData = { name, phone, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
+        
+        btn.disabled = true;
+        btn.innerText = 'جاري إرسال الرمز...';
+
+        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const params = {
+          email: email,
+          to_email: email,
+          passcode: generatedOtp,
+          time: "15 دقيقة"
         };
 
-        try {
-          const res = await fetch(`${CLOUD_URL}/users.json`, {
-            method: 'POST',
-            body: JSON.stringify(newAccount)
-          });
-          const resData = await res.json();
-          newAccount.id = resData.name;
+        // الربط المباشر مع معرف القالب template_bkhvwkx
+        emailjs.send('service_jjqzvfe', 'template_bkhvwkx', params)
+          .then(() => {
+            btn.disabled = false;
+            btn.innerText = 'إرسال رمز التحقق للإيميل';
+            hideModal('authModal');
+            document.getElementById('targetMailDisplay').innerText = email;
+            document.getElementById('enteredOtp').value = '';
+            showModal('otpModal');
 
-          activeUser = newAccount;
-          localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
-          hideModal('authModal');
-          alert('🎉 تم إنشاء وتفعيل حسابك بنجاح!');
-          refreshNavigation();
-          renderProductsList(loadedProducts);
-        } catch (err) {
-          alert('حدث خطأ أثناء حفظ البيانات السحابية.');
-        } finally {
-          btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب';
-        }
+            let remaining = 60;
+            document.getElementById('otpTimer').innerText = `${remaining} ثانية`;
+            if (timerCountdown) clearInterval(timerCountdown);
+
+            timerCountdown = setInterval(() => {
+              remaining--;
+              document.getElementById('otpTimer').innerText = `${remaining} ثانية`;
+              if (remaining <= 0) {
+                clearInterval(timerCountdown);
+                alert('انتهت صلاحية رمز التحقق. يرجى المحاولة ثانية.');
+                hideModal('otpModal');
+                generatedOtp = "";
+              }
+            }, 1000);
+          })
+          .catch((err) => {
+            btn.disabled = false;
+            btn.innerText = 'إرسال رمز التحقق للإيميل';
+            alert('فشل الإرسال: ' + (err.text || 'تأكد من كتابة البريد بشكل صحيح'));
+          });
+
       } else {
-        // حساب المالك المباشر
-        if (email === PRIMARY_OWNER && pass === "FaFa@1122") {
-          activeUser = { name: "المالك (فهد)", phone: "0500000000", email: PRIMARY_OWNER, role: "owner", banned: false };
+        if (email === OWNER_EMAIL && pass === "FaFa@1122") {
+          activeUser = { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, role: "owner", banned: false };
           localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
           hideModal('authModal');
           refreshNavigation();
           renderProductsList(loadedProducts);
-          btn.disabled = false;
-          btn.innerText = 'تسجيل الدخول';
           return;
         }
 
         const found = loadedUsers.find(u => u.email && u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
           alert('البريد الإلكتروني أو كلمة المرور غير صحيحة!');
-          btn.disabled = false;
-          btn.innerText = 'تسجيل الدخول';
           return;
         }
-
         if (found.banned) {
-          alert('⛔ تم حظر هذا الحساب من قِبل إدارة المنصة!');
-          btn.disabled = false;
-          btn.innerText = 'تسجيل الدخول';
+          alert('⛔ الحساب محظور من قِبل إدارة المنصة!');
           return;
         }
 
@@ -522,8 +524,36 @@
         hideModal('authModal');
         refreshNavigation();
         renderProductsList(loadedProducts);
-        btn.disabled = false;
-        btn.innerText = 'تسجيل الدخول';
+      }
+    }
+
+    async function verifyOtpCode() {
+      const entered = document.getElementById('enteredOtp').value.trim();
+      if (!generatedOtp) {
+        alert('انتهت صلاحية الرمز، يرجى إعادة المحاولة.');
+        return;
+      }
+      if (entered === generatedOtp) {
+        clearInterval(timerCountdown);
+        try {
+          const res = await fetch(`${CLOUD_URL}/users.json`, {
+            method: 'POST',
+            body: JSON.stringify(pendingUserData)
+          });
+          const resData = await res.json();
+          pendingUserData.id = resData.name;
+
+          activeUser = pendingUserData;
+          localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
+          hideModal('otpModal');
+          alert('🎉 تم تأكيد الرمز وتفعيل الحساب سحابياً بنجاح!');
+          refreshNavigation();
+          await syncCloudData();
+        } catch (e) {
+          alert('حدث خطأ أثناء حفظ البيانات.');
+        }
+      } else {
+        alert('رمز التحقق غير صحيح، يرجى التحقق من بريدك.');
       }
     }
 
@@ -534,7 +564,6 @@
       renderProductsList(loadedProducts);
     }
 
-    // عرض قائمة المنتجات
     function renderProductsList(items) {
       const container = document.getElementById('productsContainer');
       container.innerHTML = '';
@@ -549,7 +578,7 @@
 
         if (activeUser) {
           const rawPhone = (p.whatsapp || '').replace(/[^0-9]/g, '');
-          const msg = encodeURIComponent(`مرحباً، أود شراء الخدمة التالية: ${p.title} من منصة شير ستور`);
+          const msg = encodeURIComponent(`مرحباً، أود شراء الخدمة: ${p.title} من منصة شير ستور`);
           const waUrl = `https://wa.me/${rawPhone}?text=${msg}`;
           const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram.replace('@', '')}" target="_blank" class="action-link btn-tg">تيليجرام</a>` : '';
 
@@ -558,7 +587,7 @@
           const deleteBtn = canDelete && p.id ? `<button onclick="deleteProductItem('${p.id}')" class="action-link btn-del">🗑️ حذف</button>` : '';
 
           let banSellerBtn = '';
-          if (checkAdminStatus() && p.sellerEmail && p.sellerEmail.toLowerCase() !== PRIMARY_OWNER) {
+          if (checkAdminStatus() && p.sellerEmail && p.sellerEmail.toLowerCase() !== OWNER_EMAIL) {
             banSellerBtn = `<button onclick="banSellerDirectly('${p.sellerEmail}')" class="action-link btn-ban-direct">🚫 حظر البائع</button>`;
           }
 
@@ -605,7 +634,6 @@
       });
     }
 
-    // إضافة منتج جديد
     async function submitNewProduct(e) {
       e.preventDefault();
       const btn = document.getElementById('publishBtn');
@@ -633,19 +661,18 @@
           body: JSON.stringify(payload)
         });
         hideModal('addModal');
-        alert('✅ تم نشر الإعلان بنجاح في السحابة!');
+        alert('✅ تم نشر الإعلان بنجاح!');
         await syncCloudData();
       } catch (err) {
-        alert('تعذر حفظ الإعلان، يرجى إعادة المحاولة.');
+        alert('تعذر حفظ الإعلان، يرجى المحاولة ثانية.');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'نشر الإعلان فوراً';
+        btn.innerText = 'نشر الإعلان';
       }
     }
 
-    // حذف منتج
     async function deleteProductItem(id) {
-      if (!confirm("هل أنت متأكد من رغبتك في حذف هذا العرض نهائياً؟")) return;
+      if (!confirm("هل أنت متأكد من حذف هذا العرض نهائياً؟")) return;
       try {
         await fetch(`${CLOUD_URL}/products/${id}.json`, { method: 'DELETE' });
         alert("تم حذف العرض بنجاح.");
@@ -655,7 +682,6 @@
       }
     }
 
-    // حظر بائع من كرت المنتج
     async function banSellerDirectly(mail) {
       if (!mail) return;
       const target = loadedUsers.find(u => u.email && u.email.toLowerCase() === mail.toLowerCase());
@@ -668,21 +694,19 @@
       }
     }
 
-    // لوحة تحكم المسؤولين
     async function openAdminDashboard() {
       if (!checkAdminStatus()) return;
       await syncCloudData();
 
-      document.getElementById('addAdminContainer').style.display = isOwnerUser() ? 'block' : 'none';
       const tbody = document.getElementById('adminTableContent');
       tbody.innerHTML = '';
 
       if (loadedUsers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين في السحابة حالياً.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين بعد.</td></tr>`;
       }
 
       loadedUsers.forEach((u) => {
-        let isProtected = u.role === 'owner' || u.role === 'deputy' || (u.email && u.email.toLowerCase() === PRIMARY_OWNER);
+        let isProtected = u.role === 'owner' || u.role === 'deputy' || (u.email && u.email.toLowerCase() === OWNER_EMAIL);
         let banBtn = isProtected ? `<span style="color:#64748B;">محمي (إدارة)</span>` : `
           <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="executeBan('${u.id}', ${!u.banned})">
             ${u.banned ? 'فك الحظر' : 'حظر الحساب'}
@@ -725,22 +749,6 @@
       }
     }
 
-    async function promoteNewAdmin() {
-      const email = document.getElementById('newAdminMail').value.trim().toLowerCase();
-      if (!email) return;
-      if (!adminEmails.includes(email)) {
-        adminEmails.push(email);
-        await fetch(`${CLOUD_URL}/admins.json`, {
-          method: 'PUT',
-          body: JSON.stringify(adminEmails)
-        });
-        alert('تم إضافة الإداري بنجاح!');
-        document.getElementById('newAdminMail').value = '';
-      } else {
-        alert('هذا البريد مسجل كإداري بالفعل.');
-      }
-    }
-
     function onSearchChange() {
       const query = document.getElementById('searchBar').value.toLowerCase();
       const filtered = loadedProducts.filter(p => 
@@ -753,7 +761,6 @@
     function showModal(id) { document.getElementById(id).style.display = 'flex'; }
     function hideModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // التشغيل الأولي
     refreshNavigation();
     syncCloudData();
   </script>
