@@ -88,7 +88,7 @@
 
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
     .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
-    .modal-content.wide { max-width: 850px; }
+    .modal-content.wide { max-width: 900px; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
@@ -219,7 +219,7 @@
   <!-- لوحة تحكم المسؤولين -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين السحابية</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (إدارة الحسابات والحظر الفوري)</h3>
       
       <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
         <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
@@ -486,6 +486,7 @@
       usersList.forEach((u) => {
         let tag = u.role === 'seller' ? 'بائع' : (u.role === 'owner' ? 'المالك' : (u.role === 'deputy' ? 'نائب' : 'عميل'));
         let isProtected = u.role === 'owner' || u.role === 'deputy' || u.email === OWNER_EMAIL;
+        
         let banBtn = isProtected ? `<span style="color:#64748B;">محمي</span>` : `
           <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleBanUser('${u.id}', ${!u.banned})">
             ${u.banned ? 'إلغاء الحظر' : 'حظر الحساب'}
@@ -508,12 +509,22 @@
     }
 
     async function toggleBanUser(userId, newStatus) {
-      if (!userId) return;
-      await fetch(`${DB_URL}/users/${userId}.json`, {
-        method: 'PATCH',
-        body: JSON.stringify({ banned: newStatus })
-      });
-      openAdminPanel();
+      if (!userId) {
+        alert('تعذر تحديد معرف المستخدم.');
+        return;
+      }
+      try {
+        await fetch(`${DB_URL}/users/${userId}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ banned: newStatus })
+        });
+        alert(newStatus ? 'تم حظر المستخدم بنجاح!' : 'تم فك حظر المستخدم بنجاح!');
+        await openAdminPanel();
+      } catch (err) {
+        alert('حدث خطأ أثناء تحديث حالة الحظر.');
+        console.error(err);
+      }
     }
 
     async function addNewAdmin() {
