@@ -116,7 +116,9 @@
 
     <input type="text" id="searchInput" class="search-bar" placeholder="ابحث عن اشتراك، لعبة، أو خدمة..." onkeyup="filterProducts()">
 
-    <div class="products-grid" id="productsList"></div>
+    <div class="products-grid" id="productsList">
+      <div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:30px;">جاري تحميل المنتجات السحابية...</div>
+    </div>
   </div>
 
   <!-- نافذة تسجيل الدخول / حساب جديد -->
@@ -207,7 +209,7 @@
           <textarea id="pDesc" rows="2" required placeholder="شروط وضمان الخدمة"></textarea>
         </div>
         <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex:1;">نشر الإعلان</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="saveProductBtn">نشر الإعلان</button>
           <button type="button" class="btn btn-admin" onclick="closeModal('productModal')">إلغاء</button>
         </div>
       </form>
@@ -217,7 +219,7 @@
   <!-- لوحة تحكم المسؤولين -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (إدارة الحسابات والحظر)</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين السحابية</h3>
       
       <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
         <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
@@ -250,6 +252,8 @@
   </div>
 
   <script>
+    const DB_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
+
     (function() {
       emailjs.init("Jx6Q-8LBQvPjVbbSH");
     })();
@@ -257,12 +261,9 @@
     const OWNER_EMAIL = "erf8811@gmail.com";
     const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
-    let adminList = JSON.parse(localStorage.getItem('sharestore_admins')) || [OWNER_EMAIL, DEPUTY_EMAIL];
-
-    let users = JSON.parse(localStorage.getItem('sharestore_users')) || [
-      { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", banned: false, date: "2026/08/27" },
-      { name: "النائب", phone: "0511111111", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", banned: false, date: "2026/08/27" }
-    ];
+    let adminList = [OWNER_EMAIL, DEPUTY_EMAIL];
+    let usersList = [];
+    let productsListGlobal = [];
 
     let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
     let isRegisterMode = false;
@@ -270,16 +271,36 @@
     let currentOtpCode = "";
     let otpTimerInterval = null;
 
-    let products = JSON.parse(localStorage.getItem('sharestore_products')) || [
-      {
-        title: "اشتراك يوتيوب بريميوم 12 شهر",
-        price: "60 ريال",
-        seller: "متجر الأسطورة",
-        whatsapp: "966500000000",
-        telegram: "legend_store",
-        desc: "حساب رسمي مفعل، تسليم فوري وضمان كامل المدة."
+    async function loadCloudData() {
+      try {
+        const prodRes = await fetch(`${DB_URL}/products.json`);
+        const prodData = await prodRes.json();
+        productsListGlobal = [];
+        if (prodData) {
+          for (let key in prodData) {
+            productsListGlobal.push({ id: key, ...prodData[key] });
+          }
+        }
+        renderProducts(productsListGlobal);
+
+        const usersRes = await fetch(`${DB_URL}/users.json`);
+        const usersData = await usersRes.json();
+        usersList = [];
+        if (usersData) {
+          for (let key in usersData) {
+            usersList.push({ id: key, ...usersData[key] });
+          }
+        }
+
+        const adminsRes = await fetch(`${DB_URL}/admins.json`);
+        const adminsData = await adminsRes.json();
+        if (adminsData && Array.isArray(adminsData)) {
+          adminList = adminsData;
+        }
+      } catch (err) {
+        console.error("Cloud DB load error:", err);
       }
-    ];
+    }
 
     function isCurrentAdmin() {
       if (!currentUser) return false;
@@ -325,13 +346,15 @@
       document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'لدي حساب بالفعل' : 'حساب جديد';
     }
 
-    function handleAuth(e) {
+    async function handleAuth(e) {
       e.preventDefault();
       const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const pass = document.getElementById('authPass').value.trim();
 
+      await loadCloudData();
+
       if (isRegisterMode) {
-        if (users.find(u => u.email.toLowerCase() === email)) {
+        if (usersList.find(u => u.email && u.email.toLowerCase() === email)) {
           alert('البريد الإلكتروني مسجل مسبقاً!');
           return;
         }
@@ -347,7 +370,15 @@
         pendingUser = { name, phone, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
         sendEmailOtp(email);
       } else {
-        const found = users.find(u => u.email.toLowerCase() === email && u.pass === pass);
+        if (email === OWNER_EMAIL && pass === "FaFa@1122") {
+          currentUser = { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, role: "owner", banned: false };
+          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+          closeModal('authModal');
+          updateNav();
+          return;
+        }
+
+        const found = usersList.find(u => u.email && u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
           alert('البريد أو كلمة المرور غير صحيحة!');
           return;
@@ -402,12 +433,12 @@
         .catch((error) => {
           btn.innerText = 'متابعة';
           btn.disabled = false;
-          alert('تعذر إرسال البريد، يرجى التأكد من صحة الإيميل أو المحاولة لاحقاً.');
+          alert('تعذر إرسال البريد، يرجى التأكد من كتابة البريد بشكل صحيح.');
           console.error('EmailJS Error:', error);
         });
     }
 
-    function verifyOtp() {
+    async function verifyOtp() {
       const entered = document.getElementById('enteredOtp').value.trim();
       if (!currentOtpCode) {
         alert('انتهت صلاحية الرمز، يرجى إعادة المحاولة.');
@@ -415,15 +446,26 @@
       }
       if (entered === currentOtpCode) {
         clearInterval(otpTimerInterval);
-        users.push(pendingUser);
-        localStorage.setItem('sharestore_users', JSON.stringify(users));
-        currentUser = pendingUser;
-        localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-        closeModal('otpModal');
-        alert('تم تأكيد حسابك بنجاح! أهلاً بك في شير ستور.');
-        updateNav();
+        
+        try {
+          const res = await fetch(`${DB_URL}/users.json`, {
+            method: 'POST',
+            body: JSON.stringify(pendingUser)
+          });
+          const data = await res.json();
+          pendingUser.id = data.name;
+
+          currentUser = pendingUser;
+          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+          closeModal('otpModal');
+          alert('تم تأكيد حسابك بنجاح وسُجّل في قاعدة البيانات السحابية!');
+          updateNav();
+          loadCloudData();
+        } catch (err) {
+          alert('حدث خطأ أثناء حفظ البيانات سحابياً.');
+        }
       } else {
-        alert('رمز التحقق غير صحيح، يرجى التأكد من الرمز المرسل إلى بريدك.');
+        alert('رمز التحقق غير صحيح، يرجى التأكد من الرمز المرسل.');
       }
     }
 
@@ -433,18 +475,19 @@
       updateNav();
     }
 
-    function openAdminPanel() {
+    async function openAdminPanel() {
       if (!isCurrentAdmin()) return;
+      await loadCloudData();
 
       document.getElementById('addAdminSection').style.display = isOwner() ? 'block' : 'none';
 
       const tbody = document.getElementById('usersTableBody');
       tbody.innerHTML = '';
-      users.forEach((u, index) => {
+      usersList.forEach((u) => {
         let tag = u.role === 'seller' ? 'بائع' : (u.role === 'owner' ? 'المالك' : (u.role === 'deputy' ? 'نائب' : 'عميل'));
-        let isProtected = u.role === 'owner' || u.role === 'deputy';
+        let isProtected = u.role === 'owner' || u.role === 'deputy' || u.email === OWNER_EMAIL;
         let banBtn = isProtected ? `<span style="color:#64748B;">محمي</span>` : `
-          <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleBanUser(${index})">
+          <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleBanUser('${u.id}', ${!u.banned})">
             ${u.banned ? 'إلغاء الحظر' : 'حظر الحساب'}
           </button>
         `;
@@ -464,19 +507,25 @@
       openModal('adminModal');
     }
 
-    function toggleBanUser(index) {
-      users[index].banned = !users[index].banned;
-      localStorage.setItem('sharestore_users', JSON.stringify(users));
+    async function toggleBanUser(userId, newStatus) {
+      if (!userId) return;
+      await fetch(`${DB_URL}/users/${userId}.json`, {
+        method: 'PATCH',
+        body: JSON.stringify({ banned: newStatus })
+      });
       openAdminPanel();
     }
 
-    function addNewAdmin() {
+    async function addNewAdmin() {
       const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
       if (!email) return;
       if (!adminList.includes(email)) {
         adminList.push(email);
-        localStorage.setItem('sharestore_admins', JSON.stringify(adminList));
-        alert('تمت إضافة الإداري بنجاح!');
+        await fetch(`${DB_URL}/admins.json`, {
+          method: 'PUT',
+          body: JSON.stringify(adminList)
+        });
+        alert('تمت إضافة الإداري سحابياً بنجاح!');
         document.getElementById('newAdminEmail').value = '';
       } else {
         alert('هذا البريد مسجل كإداري مسبقاً!');
@@ -486,6 +535,12 @@
     function renderProducts(list) {
       const container = document.getElementById('productsList');
       container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:30px;">لا توجد إعلانات منشورة حالياً. كن أول من يضيف إعلاناً!</div>`;
+        return;
+      }
+
       list.forEach((p) => {
         const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
         const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
@@ -509,25 +564,42 @@
       });
     }
 
-    function saveProduct(e) {
+    async function saveProduct(e) {
       e.preventDefault();
+      const btn = document.getElementById('saveProductBtn');
+      btn.innerText = 'جاري النشر السحابي...';
+      btn.disabled = true;
+
       const newP = {
         title: document.getElementById('pTitle').value,
         price: document.getElementById('pPrice').value,
         seller: currentUser ? currentUser.name : "بائع معتمد",
         whatsapp: document.getElementById('pWhatsapp').value.replace('+', '').trim(),
         telegram: document.getElementById('pTelegram').value.replace('@', '').trim(),
-        desc: document.getElementById('pDesc').value
+        desc: document.getElementById('pDesc').value,
+        createdAt: new Date().toISOString()
       };
-      products.unshift(newP);
-      localStorage.setItem('sharestore_products', JSON.stringify(products));
-      renderProducts(products);
-      closeModal('productModal');
+
+      try {
+        await fetch(`${DB_URL}/products.json`, {
+          method: 'POST',
+          body: JSON.stringify(newP)
+        });
+        btn.innerText = 'نشر الإعلان';
+        btn.disabled = false;
+        closeModal('productModal');
+        alert('تم نشر المنتج بنجاح وأصبح متاحاً للجميع على كل الأجهزة!');
+        loadCloudData();
+      } catch (err) {
+        btn.innerText = 'نشر الإعلان';
+        btn.disabled = false;
+        alert('تعذر حفظ الإعلان، يرجى المحاولة مرة أخرى.');
+      }
     }
 
     function filterProducts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = products.filter(p => p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+      const filtered = productsListGlobal.filter(p => p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
       renderProducts(filtered);
     }
 
@@ -535,7 +607,7 @@
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     updateNav();
-    renderProducts(products);
+    loadCloudData();
   </script>
 </body>
 </html>
