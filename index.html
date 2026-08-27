@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شير ستور | SHARE STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- مكتبة EmailJS الرسمية -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root {
@@ -338,7 +339,7 @@
     const OWNER_EMAIL = "erf8811@gmail.com";
     const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
-    // تهيئة EmailJS
+    // تهيئة EmailJS بالمفتاح العام
     emailjs.init({ publicKey: "Jx6Q-8LBQvPjVbbSH" });
 
     let adminEmails = [OWNER_EMAIL, DEPUTY_EMAIL];
@@ -468,7 +469,6 @@
           time: "15 دقيقة"
         };
 
-        // الربط المباشر مع معرف القالب template_bkhvwkx
         emailjs.send('service_jjqzvfe', 'template_bkhvwkx', params)
           .then(() => {
             btn.disabled = false;
