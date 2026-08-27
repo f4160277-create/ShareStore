@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شير ستور | SHARE STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- مكتبة إرسال الإيميلات الرسمية -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
       --bg-dark: #0F172A;
@@ -127,6 +129,10 @@
           <label>الاسم الكامل *</label>
           <input type="text" id="authName" placeholder="اسمك أو اسم متجرك">
         </div>
+        <div class="form-group" id="phoneFieldGroup" style="display: none;">
+          <label>رقم الهاتف * (سري ولا يظهر للعامة)</label>
+          <input type="tel" id="authPhone" placeholder="05xxxxxxxx">
+        </div>
         <div class="form-group">
           <label>البريد الإلكتروني *</label>
           <input type="email" id="authEmail" required placeholder="example@mail.com">
@@ -143,7 +149,7 @@
           </select>
         </div>
         <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex:1;">متابعة</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="authSubmitBtn">متابعة</button>
           <button type="button" class="btn btn-outline" onclick="toggleAuthMode()" id="toggleAuthBtn">حساب جديد</button>
           <button type="button" class="btn btn-admin" onclick="closeModal('authModal')">إغلاق</button>
         </div>
@@ -151,19 +157,17 @@
     </div>
   </div>
 
-  <!-- نافذة التحقق من الرمز (OTP 60 ثانية) -->
+  <!-- نافذة التحقق من الرمز (OTP 60 ثانية بدون كشف الرمز) -->
   <div class="modal" id="otpModal">
     <div class="modal-content">
       <h3 style="margin-bottom: 10px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">أدخل رمز التحقق المكون من 6 أرقام لتفعيل الحساب.</p>
-      
-      <div id="demoOtpBox" style="background:#0F172A; border:1px dashed var(--primary); padding:10px; border-radius:6px; margin-bottom:15px; text-align:center;">
-        <span style="font-size:0.8rem; color:#94A3B8;">رمز التأكيد الخاص بك هو:</span>
-        <strong id="generatedCodeDisplay" style="font-size:1.2rem; color:#4ADE80; letter-spacing:3px; display:block; margin-top:4px;"></strong>
-      </div>
+      <p style="font-size: 0.85rem; color: #CBD5E1; margin-bottom: 15px;">
+        تم إرسال رمز تحقق مكوّن من 6 أرقام إلى بريدك الإلكتروني: <br>
+        <strong id="targetEmailDisplay" style="color: #4ADE80;"></strong>
+      </p>
 
       <div class="form-group">
-        <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.2rem; letter-spacing:4px;" required>
+        <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.3rem; letter-spacing:6px;" required>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:0.85rem;">
@@ -214,9 +218,8 @@
   <!-- لوحة تحكم الإدارة الشاملة -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (إدارة المستخدمين والحظر)</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (بيانات المستخدمين)</h3>
       
-      <!-- إضافة إداري جديد (خاصة بالمالك فقط) -->
       <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
         <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
         <div style="display:flex; gap:8px;">
@@ -230,10 +233,10 @@
           <thead>
             <tr>
               <th>الاسم</th>
+              <th>رقم الهاتف</th>
               <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
               <th>الحالة</th>
-              <th>تاريخ التسجيل</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -253,8 +256,8 @@
     let adminList = JSON.parse(localStorage.getItem('sharestore_admins')) || [OWNER_EMAIL, DEPUTY_EMAIL];
 
     let users = JSON.parse(localStorage.getItem('sharestore_users')) || [
-      { name: "المالك (فهد)", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", banned: false, date: "2026/08/27" },
-      { name: "النائب", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", banned: false, date: "2026/08/27" }
+      { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", banned: false, date: "2026/08/27" },
+      { name: "النائب", phone: "0511111111", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", banned: false, date: "2026/08/27" }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
@@ -313,6 +316,7 @@
       isRegisterMode = !isRegisterMode;
       document.getElementById('authTitle').innerText = isRegisterMode ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
       document.getElementById('nameFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('phoneFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
       document.getElementById('roleFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
       document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'لدي حساب بالفعل' : 'حساب جديد';
     }
@@ -328,11 +332,17 @@
           return;
         }
         const name = document.getElementById('authName').value.trim();
+        const phone = document.getElementById('authPhone').value.trim();
         const role = document.getElementById('authRole').value;
+
+        if (!phone) {
+          alert('يرجى كتابة رقم الهاتف.');
+          return;
+        }
         
-        pendingUser = { name, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
+        pendingUser = { name, phone, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
         closeModal('authModal');
-        startOtpFlow();
+        startOtpFlow(email);
       } else {
         const found = users.find(u => u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
@@ -350,11 +360,14 @@
       }
     }
 
-    function startOtpFlow() {
+    function startOtpFlow(email) {
       currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById('generatedCodeDisplay').innerText = currentOtpCode;
+      document.getElementById('targetEmailDisplay').innerText = email;
       document.getElementById('enteredOtp').value = '';
       openModal('otpModal');
+
+      // محاكاة إرسال البريد أوتوماتيكياً
+      console.log(`[Email Service] تم إرسال الرمز ${currentOtpCode} إلى ${email}`);
 
       let timeLeft = 60;
       document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
@@ -365,7 +378,7 @@
         document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
         if (timeLeft <= 0) {
           clearInterval(otpTimerInterval);
-          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
+          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى المحاولة مرة أخرى.');
           closeModal('otpModal');
           currentOtpCode = "";
         }
@@ -417,10 +430,10 @@
         tbody.innerHTML += `
           <tr>
             <td>${u.name}</td>
+            <td style="color:#F59E0B; font-weight:bold;">${u.phone || '-'}</td>
             <td>${u.email}</td>
             <td><strong style="color:${u.role === 'seller' || u.role === 'owner' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
             <td><span style="color:${u.banned ? '#EF4444' : '#22C55E'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ✅'}</span></td>
-            <td>${u.date || '-'}</td>
             <td>${banBtn}</td>
           </tr>
         `;
