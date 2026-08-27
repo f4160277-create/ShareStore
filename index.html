@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شير ستور | SHARE STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
       --bg-dark: #0F172A;
@@ -163,31 +162,6 @@
     </div>
   </div>
 
-  <!-- نافذة تأكيد الرمز -->
-  <div class="modal" id="otpModal">
-    <div class="modal-content">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
-      <p style="font-size: 0.85rem; color: #CBD5E1; margin-bottom: 15px;">
-        تم إرسال رمز تحقق مكوّن من 6 أرقام إلى بريدك الإلكتروني: <br>
-        <strong id="targetEmailDisplay" style="color: #4ADE80;"></strong>
-      </p>
-
-      <div class="form-group">
-        <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.3rem; letter-spacing:6px;" required>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:0.85rem;">
-        <span style="color:var(--text-muted);">الوقت المتبقي:</span>
-        <strong id="timerDisplay" style="color:#EF4444; font-size:1rem;">60 ثانية</strong>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-primary" style="flex:1;" onclick="verifyOtp()">تأكيد وتفعيل الحساب</button>
-        <button type="button" class="btn btn-admin" onclick="closeModal('otpModal')">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
   <!-- نافذة إضافة منتج -->
   <div class="modal" id="productModal">
     <div class="modal-content">
@@ -259,11 +233,6 @@
   <script>
     const DB_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
 
-    // المفتاح العام الصحيح لحسابك في EmailJS
-    (function() {
-      emailjs.init("Jx6Q-8LBQvPjVbbSH");
-    })();
-
     const OWNER_EMAIL = "erf8811@gmail.com";
     const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
@@ -273,9 +242,6 @@
 
     let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
     let isRegisterMode = false;
-    let pendingUser = null;
-    let currentOtpCode = "";
-    let otpTimerInterval = null;
 
     async function loadCloudData() {
       try {
@@ -351,18 +317,25 @@
       document.getElementById('phoneFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
       document.getElementById('roleFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
       document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'لدي حساب بالفعل' : 'حساب جديد';
+      document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'تسجيل وتفعيل الحساب فوراً' : 'تسجيل الدخول';
     }
 
     async function handleAuth(e) {
       e.preventDefault();
       const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const pass = document.getElementById('authPass').value.trim();
+      const btn = document.getElementById('authSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'جاري المعالجة...';
 
       await loadCloudData();
 
       if (isRegisterMode) {
         if (usersList.find(u => u.email && u.email.toLowerCase() === email)) {
-          alert('البريد الإلكتروني مسجل مسبقاً!');
+          alert('البريد الإلكتروني مسجل مسبقاً! يرجى تسجيل الدخول.');
+          btn.disabled = false;
+          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
           return;
         }
         const name = document.getElementById('authName').value.trim();
@@ -371,11 +344,41 @@
 
         if (!phone) {
           alert('يرجى كتابة رقم الهاتف.');
+          btn.disabled = false;
+          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
           return;
         }
         
-        pendingUser = { name, phone, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
-        sendEmailOtp(email);
+        const newUser = { 
+          name, 
+          phone, 
+          email, 
+          pass, 
+          role, 
+          banned: false, 
+          date: new Date().toLocaleDateString('ar-SA') 
+        };
+
+        try {
+          const res = await fetch(`${DB_URL}/users.json`, {
+            method: 'POST',
+            body: JSON.stringify(newUser)
+          });
+          const data = await res.json();
+          newUser.id = data.name;
+
+          currentUser = newUser;
+          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+          closeModal('authModal');
+          alert('🎉 تم إنشاء وتفعيل حسابك بنجاح!');
+          updateNav();
+          loadCloudData();
+        } catch (err) {
+          alert('تعذر حفظ الحساب، يرجى المحاولة مرة أخرى.');
+        } finally {
+          btn.disabled = false;
+          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
+        }
       } else {
         if (email === OWNER_EMAIL && pass === "FaFa@1122") {
           currentUser = { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, role: "owner", banned: false };
@@ -383,16 +386,22 @@
           closeModal('authModal');
           updateNav();
           renderProducts(productsListGlobal);
+          btn.disabled = false;
+          btn.innerText = 'تسجيل الدخول';
           return;
         }
 
         const found = usersList.find(u => u.email && u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
           alert('البريد أو كلمة المرور غير صحيحة!');
+          btn.disabled = false;
+          btn.innerText = 'تسجيل الدخول';
           return;
         }
         if (found.banned) {
           alert('عذراً، تم حظر هذا الحساب من قبل إدارة المنصة!');
+          btn.disabled = false;
+          btn.innerText = 'تسجيل الدخول';
           return;
         }
         currentUser = found;
@@ -400,94 +409,8 @@
         closeModal('authModal');
         updateNav();
         renderProducts(productsListGlobal);
-      }
-    }
-
-    function sendEmailOtp(email) {
-      currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      const btn = document.getElementById('authSubmitBtn');
-      btn.innerText = 'جاري إرسال الرمز للإيميل...';
-      btn.disabled = true;
-
-      const templateParams = {
-        to_email: email,
-        email: email,
-        passcode: currentOtpCode,
-        time: "15 دقيقة"
-      };
-
-      // تجربة الإرسال عبر معرف القالب المخصص أولاً ثم الافتراضي
-      emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
-        .then(() => {
-          onOtpSentSuccess(email, btn);
-        })
-        .catch((err1) => {
-          emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
-            .then(() => {
-              onOtpSentSuccess(email, btn);
-            })
-            .catch((err2) => {
-              btn.innerText = 'متابعة';
-              btn.disabled = false;
-              let errorMsg = err2.text || err1.text || 'تأكد من إعدادات EmailJS أو صحة البريد.';
-              alert('فشل الإرسال: ' + errorMsg);
-              console.error('EmailJS Error Details:', err1, err2);
-            });
-        });
-    }
-
-    function onOtpSentSuccess(email, btn) {
-      btn.innerText = 'متابعة';
-      btn.disabled = false;
-      closeModal('authModal');
-      document.getElementById('targetEmailDisplay').innerText = email;
-      document.getElementById('enteredOtp').value = '';
-      openModal('otpModal');
-
-      let timeLeft = 60;
-      document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-      if (otpTimerInterval) clearInterval(otpTimerInterval);
-
-      otpTimerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-        if (timeLeft <= 0) {
-          clearInterval(otpTimerInterval);
-          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
-          closeModal('otpModal');
-          currentOtpCode = "";
-        }
-      }, 1000);
-    }
-
-    async function verifyOtp() {
-      const entered = document.getElementById('enteredOtp').value.trim();
-      if (!currentOtpCode) {
-        alert('انتهت صلاحية الرمز، يرجى إعادة المحاولة.');
-        return;
-      }
-      if (entered === currentOtpCode) {
-        clearInterval(otpTimerInterval);
-        
-        try {
-          const res = await fetch(`${DB_URL}/users.json`, {
-            method: 'POST',
-            body: JSON.stringify(pendingUser)
-          });
-          const data = await res.json();
-          pendingUser.id = data.name;
-
-          currentUser = pendingUser;
-          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-          closeModal('otpModal');
-          alert('تم تأكيد وتفعيل حسابك بنجاح وسُجّل في قاعدة البيانات السحابية!');
-          updateNav();
-          loadCloudData();
-        } catch (err) {
-          alert('حدث خطأ أثناء حفظ البيانات سحابياً.');
-        }
-      } else {
-        alert('رمز التحقق غير صحيح، يرجى كتابة الرمز الواصل لبريدك.');
+        btn.disabled = false;
+        btn.innerText = 'تسجيل الدخول';
       }
     }
 
