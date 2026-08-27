@@ -181,7 +181,6 @@
         <strong id="timerDisplay" style="color:#EF4444; font-size:1rem;">60 ثانية</strong>
       </div>
 
-      <!-- زر إظهار الرمز المباشر للتسهيل الفوري -->
       <div style="background:#0F172A; padding:10px; border-radius:8px; border:1px dashed #A78BFA; margin-bottom:15px; text-align:center;">
         <p style="font-size:0.75rem; color:#94A3B8; margin-bottom:6px;">في حال تأخر وصول الرسالة لبريدك:</p>
         <button type="button" class="btn btn-outline" style="font-size:0.8rem; padding:5px 10px;" onclick="autoFillOtp()">⚡ إدخال رمز التفعيل المباشر تلقائياً</button>
@@ -414,14 +413,17 @@
       btn.innerText = 'جاري التحقق...';
       btn.disabled = true;
 
+      // إرسال كافة المتغيرات الممكنة لضمان التطابق التام مع أي صياغة في EmailJS
       const templateParams = {
-        to_email: email,
         email: email,
+        to_email: email,
+        user_email: email,
         passcode: currentOtpCode,
+        otp_code: currentOtpCode,
         time: "15 دقيقة"
       };
 
-      const proceedToOtpModal = () => {
+      const openVerificationModal = () => {
         btn.innerText = 'متابعة';
         btn.disabled = false;
         closeModal('authModal');
@@ -445,13 +447,13 @@
         }, 1000);
       };
 
-      // إرسال عبر EmailJS مع ضمان فتح النافذة فوراً
+      // إرسال عبر المعرف الدقيق للقالب
       emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
-        .then(proceedToOtpModal)
+        .then(openVerificationModal)
         .catch(() => {
           emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
-            .then(proceedToOtpModal)
-            .catch(() => proceedToOtpModal());
+            .then(openVerificationModal)
+            .catch(() => openVerificationModal());
         });
     }
 
@@ -482,7 +484,7 @@
           currentUser = pendingUser;
           localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
           closeModal('otpModal');
-          alert('تم تأكيد حسابك بنجاح وحفظه في السحابة!');
+          alert('تم تأكيد وتفعيل حسابك بنجاح وسُجّل في قاعدة البيانات السحابية!');
           updateNav();
           loadCloudData();
         } catch (err) {
