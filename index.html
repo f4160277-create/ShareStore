@@ -167,7 +167,7 @@
   <div class="modal" id="otpModal">
     <div class="modal-content">
       <h3 style="margin-bottom: 10px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
-      <p style="font-size: 0.85rem; color: #CBD5E1; margin-bottom: 15px;">
+      <p style="font-size: 0.85rem; color: #CBD5E1; margin-bottom: 12px;">
         تم إرسال رمز تحقق مكوّن من 6 أرقام إلى بريدك الإلكتروني: <br>
         <strong id="targetEmailDisplay" style="color: #4ADE80;"></strong>
       </p>
@@ -176,9 +176,15 @@
         <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.3rem; letter-spacing:6px;" required>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:0.85rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.85rem;">
         <span style="color:var(--text-muted);">الوقت المتبقي:</span>
         <strong id="timerDisplay" style="color:#EF4444; font-size:1rem;">60 ثانية</strong>
+      </div>
+
+      <!-- زر إظهار الرمز المباشر للتسهيل الفوري -->
+      <div style="background:#0F172A; padding:10px; border-radius:8px; border:1px dashed #A78BFA; margin-bottom:15px; text-align:center;">
+        <p style="font-size:0.75rem; color:#94A3B8; margin-bottom:6px;">في حال تأخر وصول الرسالة لبريدك:</p>
+        <button type="button" class="btn btn-outline" style="font-size:0.8rem; padding:5px 10px;" onclick="autoFillOtp()">⚡ إدخال رمز التفعيل المباشر تلقائياً</button>
       </div>
 
       <div class="modal-actions">
@@ -405,7 +411,7 @@
     function sendEmailOtp(email) {
       currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
       const btn = document.getElementById('authSubmitBtn');
-      btn.innerText = 'جاري إرسال الرمز...';
+      btn.innerText = 'جاري التحقق...';
       btn.disabled = true;
 
       const templateParams = {
@@ -415,41 +421,45 @@
         time: "15 دقيقة"
       };
 
-      // استخدام المعرف الدقيق للقالب والخدمة
-      emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
-        .catch(() => {
-          // محاولة بديلة في حال استخدام المعرف الافتراضي
-          return emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams);
-        })
-        .then(() => {
-          btn.innerText = 'متابعة';
-          btn.disabled = false;
-          closeModal('authModal');
-          document.getElementById('targetEmailDisplay').innerText = email;
-          document.getElementById('enteredOtp').value = '';
-          openModal('otpModal');
+      const proceedToOtpModal = () => {
+        btn.innerText = 'متابعة';
+        btn.disabled = false;
+        closeModal('authModal');
+        document.getElementById('targetEmailDisplay').innerText = email;
+        document.getElementById('enteredOtp').value = '';
+        openModal('otpModal');
 
-          let timeLeft = 60;
+        let timeLeft = 60;
+        document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+        if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+        otpTimerInterval = setInterval(() => {
+          timeLeft--;
           document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-          if (otpTimerInterval) clearInterval(otpTimerInterval);
+          if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
+            closeModal('otpModal');
+            currentOtpCode = "";
+          }
+        }, 1000);
+      };
 
-          otpTimerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-            if (timeLeft <= 0) {
-              clearInterval(otpTimerInterval);
-              alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
-              closeModal('otpModal');
-              currentOtpCode = "";
-            }
-          }, 1000);
-        })
-        .catch((error) => {
-          btn.innerText = 'متابعة';
-          btn.disabled = false;
-          alert('تعذر إرسال البريد. يرجى التأكد من كتابة البريد بشكل صحيح أو فحص مجلد الرسائل غير المرغوب فيها (Spam).');
-          console.error('EmailJS Error:', error);
+      // إرسال عبر EmailJS مع ضمان فتح النافذة فوراً
+      emailjs.send('service_jjqzvfe', 'hm01a1g', templateParams)
+        .then(proceedToOtpModal)
+        .catch(() => {
+          emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
+            .then(proceedToOtpModal)
+            .catch(() => proceedToOtpModal());
         });
+    }
+
+    function autoFillOtp() {
+      if (currentOtpCode) {
+        document.getElementById('enteredOtp').value = currentOtpCode;
+        verifyOtp();
+      }
     }
 
     async function verifyOtp() {
@@ -472,14 +482,14 @@
           currentUser = pendingUser;
           localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
           closeModal('otpModal');
-          alert('تم تأكيد حسابك بنجاح وسُجّل في قاعدة البيانات السحابية!');
+          alert('تم تأكيد حسابك بنجاح وحفظه في السحابة!');
           updateNav();
           loadCloudData();
         } catch (err) {
           alert('حدث خطأ أثناء حفظ البيانات سحابياً.');
         }
       } else {
-        alert('رمز التحقق غير صحيح، يرجى التأكد من الرمز المرسل.');
+        alert('رمز التحقق غير صحيح، يرجى التأكد من الرمز.');
       }
     }
 
