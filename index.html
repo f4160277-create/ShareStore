@@ -17,18 +17,8 @@
       --telegram: #0088CC;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Tajawal', sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      padding-bottom: 60px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 60px; }
 
     header {
       background-color: var(--card-bg);
@@ -39,43 +29,24 @@
       border-bottom: 1px solid rgba(124, 58, 237, 0.2);
     }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .logo-container { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.1rem; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
 
-    .logo-icon {
-      font-size: 24px;
-      color: var(--primary);
-    }
-
-    .logo-text {
-      font-weight: 900;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-add-product {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 8px 16px;
+    .btn {
+      padding: 8px 14px;
       border-radius: 8px;
+      border: none;
       cursor: pointer;
       font-weight: bold;
+      font-size: 0.85rem;
       transition: 0.2s;
     }
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--primary); color: white; }
+    .btn-admin { background: #334155; color: #F8FAFC; }
 
-    .btn-add-product:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 0 15px;
-    }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
 
     .disclaimer {
       background-color: rgba(124, 58, 237, 0.1);
@@ -85,9 +56,6 @@
       font-size: 0.85rem;
       color: #E2E8F0;
       margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .search-bar {
@@ -102,208 +70,150 @@
       margin-bottom: 25px;
     }
 
-    .search-bar:focus {
-      border-color: var(--primary);
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border: 1px solid #334155;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .product-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-    }
-
-    .product-price {
-      color: #4ADE80;
-      font-weight: bold;
-      font-size: 1.1rem;
-      white-space: nowrap;
-    }
-
-    .seller-info {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .product-desc {
-      font-size: 0.9rem;
-      color: #CBD5E1;
-      margin-bottom: 16px;
-      line-height: 1.4;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 8px;
-      border-radius: 6px;
-      text-decoration: none;
-      color: white;
-      text-align: center;
-      font-size: 0.85rem;
-      font-weight: bold;
-      display: block;
-    }
-
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; border: 1px solid #334155; display: flex; flex-direction: column; justify-content: space-between; }
+    .product-title { font-size: 1.1rem; font-weight: bold; }
+    .product-price { color: #4ADE80; font-weight: bold; font-size: 1.1rem; }
+    .seller-info { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 10px; }
+    .product-desc { font-size: 0.9rem; color: #CBD5E1; margin-bottom: 14px; }
+    .action-buttons { display: flex; gap: 8px; }
+    .btn-action { flex: 1; padding: 8px; border-radius: 6px; text-decoration: none; color: white; text-align: center; font-size: 0.85rem; font-weight: bold; }
     .btn-wa { background-color: var(--whatsapp); }
     .btn-tg { background-color: var(--telegram); }
 
-    /* Modal Form */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      z-index: 100;
-    }
+    /* النوافذ المنبثقة */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
+    .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
+    .modal-content.wide { max-width: 700px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
 
-    .modal-content {
-      background-color: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 450px;
-      width: 100%;
-      border: 1px solid var(--primary);
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 10px;
-      background: #0F172A;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: white;
-      outline: none;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-submit {
-      flex: 1;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .btn-cancel {
-      background: #475569;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+    th, td { padding: 10px; border: 1px solid #334155; text-align: right; }
+    th { background: #0F172A; color: var(--primary); }
   </style>
 </head>
 <body>
 
   <header>
     <div class="logo-container">
-      <div class="logo-icon">♾️</div>
-      <div class="logo-text">شير ستور | SHARE STORE</div>
+      <span>♾️</span>
+      <span>شير ستور | SHARE STORE</span>
     </div>
-    <button class="btn-add-product" onclick="openModal()">+ أضف إعلانك</button>
+    <div class="header-actions" id="authNav">
+      <!-- أزرار الدخول تظهر هنا -->
+    </div>
   </header>
 
   <div class="container">
     <div class="disclaimer">
-      <span>⚠️</span>
-      <span><strong>تنبيه:</strong> المنصة مجرد وسيط إعلاني لعرض الخدمات. التعامل المالي والتسليم يقع على المسؤولية الشخصية للطرفين.</span>
+      ⚠️ <strong>تنبيه:</strong> المنصة وسيط إعلاني فقط. التعامل المالي والتسليم مسؤولية البائع والمشتري مباشرة.
     </div>
 
     <input type="text" id="searchInput" class="search-bar" placeholder="ابحث عن اشتراك، لعبة، أو خدمة..." onkeyup="filterProducts()">
 
-    <div class="products-grid" id="productsList">
-      <!-- المنتجات تظهر هنا تلقائياً -->
-    </div>
+    <div class="products-grid" id="productsList"></div>
   </div>
 
-  <!-- Modal إضافة منتج -->
-  <div class="modal" id="productModal">
+  <!-- نافذة تسجيل الدخول / حساب جديد -->
+  <div class="modal" id="authModal">
     <div class="modal-content">
-      <h3 style="margin-bottom: 15px;">إضافة خدمة / منتج جديد</h3>
-      <form id="productForm" onsubmit="saveProduct(event)">
-        <div class="form-group">
-          <label>اسم الخدمة / المنتج *</label>
-          <input type="text" id="pTitle" required placeholder="مثال: يوتيوب بريميوم سنة">
+      <h3 id="authTitle" style="margin-bottom: 15px;">تسجيل الدخول</h3>
+      <form id="authForm" onsubmit="handleAuth(event)">
+        <div class="form-group" id="nameFieldGroup" style="display: none;">
+          <label>الاسم الكامل *</label>
+          <input type="text" id="authName" placeholder="اسمك أو اسم متجرك">
         </div>
         <div class="form-group">
-          <label>السعر (مع العملة) *</label>
-          <input type="text" id="pPrice" required placeholder="مثال: 60 ريال">
+          <label>البريد الإلكتروني / رقم الجوال *</label>
+          <input type="text" id="authEmail" required placeholder="example@mail.com">
         </div>
         <div class="form-group">
-          <label>اسم المتجر / البائع *</label>
-          <input type="text" id="pSeller" required placeholder="مثال: متجر السعادة">
+          <label>كلمة المرور *</label>
+          <input type="password" id="authPass" required placeholder="******">
         </div>
-        <div class="form-group">
-          <label>رقم الواتساب (بالصيغة الدولية) *</label>
-          <input type="text" id="pWhatsapp" required placeholder="9665xxxxxxxx">
-        </div>
-        <div class="form-group">
-          <label>يوزر التيليجرام (بدون @ - اختياري)</label>
-          <input type="text" id="pTelegram" placeholder="username">
-        </div>
-        <div class="form-group">
-          <label>الوصف والشروط *</label>
-          <textarea id="pDesc" rows="2" required placeholder="تفاصيل الحساب أو مدة الضمان"></textarea>
+        <div class="form-group" id="roleFieldGroup" style="display: none;">
+          <label>نوع الحساب *</label>
+          <select id="authRole">
+            <option value="customer">عميل (تصفح وشراء فقط)</option>
+            <option value="seller">بائع (عرض وإضافة خدمات)</option>
+          </select>
         </div>
         <div class="modal-actions">
-          <button type="submit" class="btn-submit">نشر الإعلان</button>
-          <button type="button" class="btn-cancel" onclick="closeModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">متابعة</button>
+          <button type="button" class="btn btn-outline" onclick="toggleAuthMode()" id="toggleAuthBtn">حساب جديد</button>
+          <button type="button" class="btn btn-admin" onclick="closeModal('authModal')">إغلاق</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- نافذة إضافة منتج (خاصة بالبائع فقط) -->
+  <div class="modal" id="productModal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 15px;">إضافة خدمة / منتج جديد</h3>
+      <form onsubmit="saveProduct(event)">
+        <div class="form-group">
+          <label>اسم الخدمة / المنتج *</label>
+          <input type="text" id="pTitle" required placeholder="يوتيوب بريميوم سنة">
+        </div>
+        <div class="form-group">
+          <label>السعر *</label>
+          <input type="text" id="pPrice" required placeholder="60 ريال">
+        </div>
+        <div class="form-group">
+          <label>رقم الواتساب للتواصل *</label>
+          <input type="text" id="pWhatsapp" required placeholder="9665xxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label>يوزر تيليجرام (اختياري)</label>
+          <input type="text" id="pTelegram" placeholder="username">
+        </div>
+        <div class="form-group">
+          <label>تفاصيل الخدمة *</label>
+          <textarea id="pDesc" rows="2" required placeholder="شروط وضمان الخدمة"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" style="flex:1;">نشر الإعلان</button>
+          <button type="button" class="btn btn-admin" onclick="closeModal('productModal')">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- لوحة تحكم الإدارة (خاصة بك أنت فقط) -->
+  <div class="modal" id="adminModal">
+    <div class="modal-content wide">
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤول (قائمة المستخدمين)</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>بيانات التواصل / البريد</th>
+              <th>نوع الحساب</th>
+              <th>تاريخ التسجيل</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button type="button" class="btn btn-primary" onclick="closeModal('adminModal')">إغلاق اللوحة</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // كلمة المرور الخاصة بك للدخول كمسؤول
+    const ADMIN_SECRET = "123456"; 
+
+    let users = JSON.parse(localStorage.getItem('sharestore_users')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
+    let isRegisterMode = false;
+
     let products = JSON.parse(localStorage.getItem('sharestore_products')) || [
       {
         title: "اشتراك يوتيوب بريميوم 12 شهر",
@@ -311,30 +221,105 @@
         seller: "متجر الأسطورة",
         whatsapp: "966500000000",
         telegram: "legend_store",
-        desc: "حساب رسمي مفعل بالكامل، ضمان كامل المدة، تسليم فوري."
-      },
-      {
-        title: "شحن شدات ببجي 660 UC",
-        price: "42 ريال",
-        seller: "فهد الرقمي",
-        whatsapp: "966511111111",
-        telegram: "",
-        desc: "شحن مباشر عبر الأيدي ID خلال 5 دقائق فقط."
+        desc: "حساب رسمي مفعل، تسليم فوري وضمان كامل المدة."
       }
     ];
+
+    function updateNav() {
+      const nav = document.getElementById('authNav');
+      if (currentUser) {
+        let addBtn = currentUser.role === 'seller' ? `<button class="btn btn-primary" onclick="openModal('productModal')">+ أضف إعلانك</button>` : '';
+        nav.innerHTML = `
+          ${addBtn}
+          <span style="font-size:0.85rem; color:#94A3B8;">مرحباً، ${currentUser.name} (${currentUser.role === 'seller' ? 'بائع' : 'عميل'})</span>
+          <button class="btn btn-outline" onclick="logout()">خروج</button>
+          <button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>
+        `;
+      } else {
+        nav.innerHTML = `
+          <button class="btn btn-primary" onclick="openModal('authModal')">تسجيل الدخول</button>
+          <button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>
+        `;
+      }
+    }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('authTitle').innerText = isRegisterMode ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
+      document.getElementById('nameFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('roleFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'لدي حساب بالفعل' : 'حساب جديد';
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPass').value.trim();
+
+      if (isRegisterMode) {
+        const name = document.getElementById('authName').value.trim();
+        const role = document.getElementById('authRole').value;
+        const newUser = { name, email, pass, role, date: new Date().toLocaleDateString('ar-SA') };
+        users.push(newUser);
+        localStorage.setItem('sharestore_users', JSON.stringify(users));
+        currentUser = newUser;
+      } else {
+        const found = users.find(u => u.email === email && u.pass === pass);
+        if (found) {
+          currentUser = found;
+        } else {
+          alert('البيانات غير صحيحة، أو الحساب غير موجود. اضغط على "حساب جديد" لإنشاء حساب.');
+          return;
+        }
+      }
+
+      localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+      closeModal('authModal');
+      updateNav();
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('sharestore_current_user');
+      updateNav();
+    }
+
+    function openAdminPanel() {
+      const pass = prompt("أدخل رمز دخول المسؤول (الرقم الافتراضي: 123456):");
+      if (pass === ADMIN_SECRET) {
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = '';
+        if(users.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا يوجد مسجلين حتى الآن</td></tr>';
+        } else {
+          users.forEach(u => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${u.name}</td>
+                <td>${u.email}</td>
+                <td><strong style="color:${u.role === 'seller' ? '#A78BFA' : '#38BDF8'}">${u.role === 'seller' ? 'بائع' : 'عميل'}</strong></td>
+                <td>${u.date || '-'}</td>
+              </tr>
+            `;
+          });
+        }
+        openModal('adminModal');
+      } else if (pass !== null) {
+        alert("رمز الدخول غير صحيح!");
+      }
+    }
 
     function renderProducts(list) {
       const container = document.getElementById('productsList');
       container.innerHTML = '';
       list.forEach((p) => {
-        const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} المعروض في شير ستور`);
+        const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
         const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
         const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram}" target="_blank" class="btn-action btn-tg">تيليجرام</a>` : '';
-
         container.innerHTML += `
           <div class="card">
             <div>
-              <div class="card-header">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="product-title">${p.title}</div>
                 <div class="product-price">${p.price}</div>
               </div>
@@ -350,15 +335,12 @@
       });
     }
 
-    function openModal() { document.getElementById('productModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-
     function saveProduct(e) {
       e.preventDefault();
       const newP = {
         title: document.getElementById('pTitle').value,
         price: document.getElementById('pPrice').value,
-        seller: document.getElementById('pSeller').value,
+        seller: currentUser ? currentUser.name : "بائع معتمد",
         whatsapp: document.getElementById('pWhatsapp').value.replace('+', '').trim(),
         telegram: document.getElementById('pTelegram').value.replace('@', '').trim(),
         desc: document.getElementById('pDesc').value
@@ -366,8 +348,7 @@
       products.unshift(newP);
       localStorage.setItem('sharestore_products', JSON.stringify(products));
       renderProducts(products);
-      closeModal();
-      document.getElementById('productForm').reset();
+      closeModal('productModal');
     }
 
     function filterProducts() {
@@ -376,6 +357,10 @@
       renderProducts(filtered);
     }
 
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    updateNav();
     renderProducts(products);
   </script>
 </body>
