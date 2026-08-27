@@ -80,12 +80,16 @@
     .product-title { font-size: 1.1rem; font-weight: bold; }
     .product-price { color: #4ADE80; font-weight: bold; font-size: 1.1rem; }
     .seller-info { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 10px; }
+    .admin-info-badge { background: #0F172A; border: 1px solid #475569; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: #CBD5E1; margin: 8px 0; }
     .product-desc { font-size: 0.9rem; color: #CBD5E1; margin-bottom: 14px; }
     .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-action { flex: 1; padding: 8px; border-radius: 6px; text-decoration: none; color: white; text-align: center; font-size: 0.85rem; font-weight: bold; min-width: 80px; }
+    .btn-action { flex: 1; padding: 9px; border-radius: 6px; text-decoration: none; color: white; text-align: center; font-size: 0.85rem; font-weight: bold; min-width: 80px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
     .btn-wa { background-color: var(--whatsapp); }
     .btn-tg { background-color: var(--telegram); }
-    .btn-del { background-color: #EF4444; border: none; cursor: pointer; }
+    .btn-del { background-color: #EF4444; }
+    .btn-ban-quick { background-color: #991B1B; }
+    .btn-login-to-order { background: linear-gradient(135deg, #7C3AED, #4F46E5); width: 100%; padding: 10px; font-size: 0.9rem; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-login-to-order:hover { opacity: 0.9; transform: translateY(-1px); }
 
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
     .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
@@ -221,7 +225,7 @@
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="color: var(--primary);">⚙️ لوحة إدارة الحسابات والحظر</h3>
+        <h3 style="color: var(--primary);">⚙️ لوحة إدارة الحسابات السحابية</h3>
         <button class="btn btn-danger" onclick="closeModal('adminModal')">✕ إغلاق</button>
       </div>
       
@@ -241,8 +245,9 @@
               <th>رقم الهاتف</th>
               <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
-              <th>الحالة الحالية</th>
-              <th>إجراء الحظر / الفك</th>
+              <th>الحالة</th>
+              <th>تاريخ التسجيل</th>
+              <th>إجراء الحظر</th>
             </tr>
           </thead>
           <tbody id="usersTableBody"></tbody>
@@ -281,7 +286,6 @@
             productsListGlobal.push({ id: key, ...prodData[key] });
           }
         }
-        renderProducts(productsListGlobal);
 
         const usersRes = await fetch(`${DB_URL}/users.json`);
         const usersData = await usersRes.json();
@@ -297,6 +301,8 @@
         if (adminsData && Array.isArray(adminsData)) {
           adminList = adminsData;
         }
+
+        renderProducts(productsListGlobal);
       } catch (err) {
         console.error("Cloud DB load error:", err);
       }
@@ -317,7 +323,7 @@
       if (currentUser) {
         const canSell = currentUser.role === 'seller' || isCurrentAdmin();
         let addBtn = canSell ? `<button class="btn btn-primary" onclick="openModal('productModal')">+ أضف إعلانك</button>` : '';
-        let adminBtn = isCurrentAdmin() ? `<button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة والحظر</button>` : '';
+        let adminBtn = isCurrentAdmin() ? `<button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>` : '';
         
         let roleDisplay = "عميل";
         if (isOwner()) roleDisplay = "المالك";
@@ -488,7 +494,7 @@
       tbody.innerHTML = '';
 
       if (usersList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين بعد.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين بعد.</td></tr>`;
       }
 
       usersList.forEach((u) => {
@@ -508,6 +514,7 @@
             <td>${u.email}</td>
             <td><strong style="color:${u.role === 'seller' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
             <td><span style="color:${u.banned ? '#EF4444' : '#22C55E'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ومفعل ✅'}</span></td>
+            <td>${u.date || '-'}</td>
             <td>${banBtn}</td>
           </tr>
         `;
@@ -527,10 +534,28 @@
           body: JSON.stringify({ banned: newStatus })
         });
         alert(newStatus ? 'تم حظر المستخدم بنجاح!' : 'تم فك حظر المستخدم بنجاح!');
-        await openAdminPanel();
+        await loadCloudData();
+        if (document.getElementById('adminModal').style.display === 'flex') {
+          openAdminPanel();
+        }
       } catch (err) {
         alert('حدث خطأ أثناء تحديث حالة الحظر.');
         console.error(err);
+      }
+    }
+
+    async function banSellerByEmail(sellerEmail) {
+      if (!sellerEmail) {
+        alert('لا يوجد بريد إلكتروني مسجل لهذا البائع.');
+        return;
+      }
+      const targetUser = usersList.find(u => u.email && u.email.toLowerCase() === sellerEmail.toLowerCase());
+      if (!targetUser) {
+        alert('لم يتم العثور على حساب البائع في قاعدة البيانات.');
+        return;
+      }
+      if (confirm(`هل أنت متأكد من حظر حساب البائع (${targetUser.name}) صاحب الإيميل (${targetUser.email})؟`)) {
+        await toggleBanUser(targetUser.id, true);
       }
     }
 
@@ -560,12 +585,49 @@
       }
 
       list.forEach((p) => {
-        const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
-        const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
-        const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram}" target="_blank" class="btn-action btn-tg">تيليجرام</a>` : '';
-        
-        let canDelete = isCurrentAdmin() || (currentUser && currentUser.email === p.sellerEmail);
-        let delBtn = canDelete && p.id ? `<button onclick="deleteProduct('${p.id}')" class="btn-action btn-del">🗑️ حذف الإعلان</button>` : '';
+        let actionArea = '';
+
+        // إذا كان الزائر مسجل دخول، تظهر له أزرار التواصل
+        if (currentUser) {
+          const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
+          const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
+          const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram}" target="_blank" class="btn-action btn-tg">تيليجرام</a>` : '';
+          
+          let isSellerOwner = currentUser && p.sellerEmail && (currentUser.email.toLowerCase() === p.sellerEmail.toLowerCase());
+          let canDelete = isCurrentAdmin() || isSellerOwner;
+          let delBtn = canDelete && p.id ? `<button onclick="deleteProduct('${p.id}')" class="btn-action btn-del">🗑️ حذف</button>` : '';
+
+          let banBtnDirect = '';
+          if (isCurrentAdmin() && p.sellerEmail && p.sellerEmail.toLowerCase() !== OWNER_EMAIL) {
+            banBtnDirect = `<button onclick="banSellerByEmail('${p.sellerEmail}')" class="btn-action btn-ban-quick">🚫 حظر البائع</button>`;
+          }
+
+          actionArea = `
+            <div class="action-buttons">
+              <a href="${waLink}" target="_blank" class="btn-action btn-wa">واتساب</a>
+              ${tgBtn}
+              ${delBtn}
+              ${banBtnDirect}
+            </div>
+          `;
+        } else {
+          // إذا كان الزائر غير مسجل دخول
+          actionArea = `
+            <button class="btn-login-to-order" onclick="openModal('authModal')">
+              🔒 سجل دخولك للطلب والتواصل
+            </button>
+          `;
+        }
+
+        let adminSellerBadge = '';
+        if (isCurrentAdmin() && p.sellerEmail) {
+          adminSellerBadge = `
+            <div class="admin-info-badge">
+              🔒 <strong>بيانات البائع للإدارة:</strong><br>
+              الإيميل: ${p.sellerEmail} | الجوال: ${p.sellerPhone || p.whatsapp}
+            </div>
+          `;
+        }
 
         container.innerHTML += `
           <div class="card">
@@ -575,13 +637,10 @@
                 <div class="product-price">${p.price}</div>
               </div>
               <div class="seller-info">البائع: ${p.seller}</div>
+              ${adminSellerBadge}
               <div class="product-desc">${p.desc}</div>
             </div>
-            <div class="action-buttons">
-              <a href="${waLink}" target="_blank" class="btn-action btn-wa">واتساب</a>
-              ${tgBtn}
-              ${delBtn}
-            </div>
+            ${actionArea}
           </div>
         `;
       });
@@ -609,6 +668,7 @@
         price: document.getElementById('pPrice').value,
         seller: currentUser ? currentUser.name : "بائع معتمد",
         sellerEmail: currentUser ? currentUser.email : "",
+        sellerPhone: currentUser ? currentUser.phone : "",
         whatsapp: document.getElementById('pWhatsapp').value.replace('+', '').trim(),
         telegram: document.getElementById('pTelegram').value.replace('@', '').trim(),
         desc: document.getElementById('pDesc').value,
