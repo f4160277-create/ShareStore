@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>شير ستور | SHARE STORE</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-  <!-- مكتبة إرسال الإيميلات الرسمية -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     :root {
@@ -130,7 +129,7 @@
           <input type="text" id="authName" placeholder="اسمك أو اسم متجرك">
         </div>
         <div class="form-group" id="phoneFieldGroup" style="display: none;">
-          <label>رقم الهاتف * (سري ولا يظهر للعامة)</label>
+          <label>رقم الهاتف * (سري ولا يظهر إلا للإدارة)</label>
           <input type="tel" id="authPhone" placeholder="05xxxxxxxx">
         </div>
         <div class="form-group">
@@ -157,7 +156,7 @@
     </div>
   </div>
 
-  <!-- نافذة التحقق من الرمز (OTP 60 ثانية بدون كشف الرمز) -->
+  <!-- نافذة التحقق من الرمز -->
   <div class="modal" id="otpModal">
     <div class="modal-content">
       <h3 style="margin-bottom: 10px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
@@ -215,10 +214,10 @@
     </div>
   </div>
 
-  <!-- لوحة تحكم الإدارة الشاملة -->
+  <!-- لوحة تحكم المسؤولين -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (بيانات المستخدمين)</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (إدارة الحسابات والحظر)</h3>
       
       <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
         <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
@@ -237,6 +236,7 @@
               <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
               <th>الحالة</th>
+              <th>تاريخ التسجيل</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -250,6 +250,10 @@
   </div>
 
   <script>
+    (function() {
+      emailjs.init("Jx6Q-8LBQvPjVbbSH");
+    })();
+
     const OWNER_EMAIL = "erf8811@gmail.com";
     const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
@@ -341,8 +345,7 @@
         }
         
         pendingUser = { name, phone, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
-        closeModal('authModal');
-        startOtpFlow(email);
+        sendEmailOtp(email);
       } else {
         const found = users.find(u => u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
@@ -360,35 +363,54 @@
       }
     }
 
-    function startOtpFlow(email) {
+    function sendEmailOtp(email) {
       currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById('targetEmailDisplay').innerText = email;
-      document.getElementById('enteredOtp').value = '';
-      openModal('otpModal');
+      const btn = document.getElementById('authSubmitBtn');
+      btn.innerText = 'جاري إرسال الرمز...';
+      btn.disabled = true;
 
-      // محاكاة إرسال البريد أوتوماتيكياً
-      console.log(`[Email Service] تم إرسال الرمز ${currentOtpCode} إلى ${email}`);
+      const templateParams = {
+        email: email,
+        passcode: currentOtpCode,
+        time: "15 دقيقة"
+      };
 
-      let timeLeft = 60;
-      document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-      if (otpTimerInterval) clearInterval(otpTimerInterval);
+      emailjs.send('service_jjqzvfe', 'template_bkhvwkx', templateParams)
+        .then(() => {
+          btn.innerText = 'متابعة';
+          btn.disabled = false;
+          closeModal('authModal');
+          document.getElementById('targetEmailDisplay').innerText = email;
+          document.getElementById('enteredOtp').value = '';
+          openModal('otpModal');
 
-      otpTimerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
-        if (timeLeft <= 0) {
-          clearInterval(otpTimerInterval);
-          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى المحاولة مرة أخرى.');
-          closeModal('otpModal');
-          currentOtpCode = "";
-        }
-      }, 1000);
+          let timeLeft = 60;
+          document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+          if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+          otpTimerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+            if (timeLeft <= 0) {
+              clearInterval(otpTimerInterval);
+              alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
+              closeModal('otpModal');
+              currentOtpCode = "";
+            }
+          }, 1000);
+        })
+        .catch((error) => {
+          btn.innerText = 'متابعة';
+          btn.disabled = false;
+          alert('تعذر إرسال البريد، يرجى التأكد من صحة الإيميل أو المحاولة لاحقاً.');
+          console.error('EmailJS Error:', error);
+        });
     }
 
     function verifyOtp() {
       const entered = document.getElementById('enteredOtp').value.trim();
       if (!currentOtpCode) {
-        alert('انتهت صلاحية الرمز، يرجى إعادة التسجيل.');
+        alert('انتهت صلاحية الرمز، يرجى إعادة المحاولة.');
         return;
       }
       if (entered === currentOtpCode) {
@@ -398,10 +420,10 @@
         currentUser = pendingUser;
         localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
         closeModal('otpModal');
-        alert('تم تأكيد الحساب بنجاح!');
+        alert('تم تأكيد حسابك بنجاح! أهلاً بك في شير ستور.');
         updateNav();
       } else {
-        alert('الرمز الذي أدخلته غير صحيح!');
+        alert('رمز التحقق غير صحيح، يرجى التأكد من الرمز المرسل إلى بريدك.');
       }
     }
 
@@ -434,6 +456,7 @@
             <td>${u.email}</td>
             <td><strong style="color:${u.role === 'seller' || u.role === 'owner' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
             <td><span style="color:${u.banned ? '#EF4444' : '#22C55E'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ✅'}</span></td>
+            <td>${u.date || '-'}</td>
             <td>${banBtn}</td>
           </tr>
         `;
