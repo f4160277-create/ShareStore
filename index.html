@@ -81,10 +81,9 @@
     .btn-wa { background-color: var(--whatsapp); }
     .btn-tg { background-color: var(--telegram); }
 
-    /* النوافذ المنبثقة */
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
     .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
-    .modal-content.wide { max-width: 700px; }
+    .modal-content.wide { max-width: 750px; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
@@ -102,9 +101,7 @@
       <span>♾️</span>
       <span>شير ستور | SHARE STORE</span>
     </div>
-    <div class="header-actions" id="authNav">
-      <!-- أزرار الدخول تظهر هنا -->
-    </div>
+    <div class="header-actions" id="authNav"></div>
   </header>
 
   <div class="container">
@@ -127,8 +124,8 @@
           <input type="text" id="authName" placeholder="اسمك أو اسم متجرك">
         </div>
         <div class="form-group">
-          <label>البريد الإلكتروني / رقم الجوال *</label>
-          <input type="text" id="authEmail" required placeholder="example@mail.com">
+          <label>البريد الإلكتروني *</label>
+          <input type="email" id="authEmail" required placeholder="example@mail.com">
         </div>
         <div class="form-group">
           <label>كلمة المرور *</label>
@@ -137,8 +134,8 @@
         <div class="form-group" id="roleFieldGroup" style="display: none;">
           <label>نوع الحساب *</label>
           <select id="authRole">
-            <option value="customer">عميل (تصفح وشراء فقط)</option>
-            <option value="seller">بائع (عرض وإضافة خدمات)</option>
+            <option value="customer">عميل (تصفح وشراء)</option>
+            <option value="seller">بائع (عرض ونشر خدمات)</option>
           </select>
         </div>
         <div class="modal-actions">
@@ -150,7 +147,7 @@
     </div>
   </div>
 
-  <!-- نافذة إضافة منتج (خاصة بالبائع فقط) -->
+  <!-- نافذة إضافة منتج (خاصة بالبائع والمسؤولين) -->
   <div class="modal" id="productModal">
     <div class="modal-content">
       <h3 style="margin-bottom: 15px;">إضافة خدمة / منتج جديد</h3>
@@ -183,16 +180,26 @@
     </div>
   </div>
 
-  <!-- لوحة تحكم الإدارة (خاصة بك أنت فقط) -->
+  <!-- لوحة تحكم الإدارة (تظهر فقط للمالك والنائب) -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤول (قائمة المستخدمين)</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين</h3>
+      
+      <!-- إضافة إداري جديد (خاصة بالمالك فقط) -->
+      <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
+        <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
+        <div style="display:flex; gap:8px;">
+          <input type="email" id="newAdminEmail" placeholder="البريد الإلكتروني للإداري" style="flex:1; padding:8px; background:#1E293B; border:1px solid #334155; color:white; border-radius:6px;">
+          <button class="btn btn-primary" onclick="addNewAdmin()">إضافة</button>
+        </div>
+      </div>
+
       <div style="overflow-x: auto;">
         <table>
           <thead>
             <tr>
               <th>الاسم</th>
-              <th>بيانات التواصل / البريد</th>
+              <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
               <th>تاريخ التسجيل</th>
             </tr>
@@ -207,10 +214,17 @@
   </div>
 
   <script>
-    // كلمة المرور الخاصة بك للدخول كمسؤول
-    const ADMIN_SECRET = "123456"; 
+    const OWNER_EMAIL = "erf881@gmail.com";
+    const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
-    let users = JSON.parse(localStorage.getItem('sharestore_users')) || [];
+    // قائمة الإداريين الافتراضية
+    let adminList = JSON.parse(localStorage.getItem('sharestore_admins')) || [OWNER_EMAIL, DEPUTY_EMAIL];
+
+    let users = JSON.parse(localStorage.getItem('sharestore_users')) || [
+      { name: "المالك (فهد)", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", date: "2026/08/27" },
+      { name: "النائب", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", date: "2026/08/27" }
+    ];
+
     let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
     let isRegisterMode = false;
 
@@ -225,20 +239,37 @@
       }
     ];
 
+    function isCurrentAdmin() {
+      if (!currentUser) return false;
+      const email = currentUser.email.toLowerCase();
+      return adminList.map(e => e.toLowerCase()).includes(email) || email === OWNER_EMAIL || email === DEPUTY_EMAIL;
+    }
+
+    function isOwner() {
+      return currentUser && currentUser.email.toLowerCase() === OWNER_EMAIL;
+    }
+
     function updateNav() {
       const nav = document.getElementById('authNav');
       if (currentUser) {
-        let addBtn = currentUser.role === 'seller' ? `<button class="btn btn-primary" onclick="openModal('productModal')">+ أضف إعلانك</button>` : '';
+        const canSell = currentUser.role === 'seller' || isCurrentAdmin();
+        let addBtn = canSell ? `<button class="btn btn-primary" onclick="openModal('productModal')">+ أضف إعلانك</button>` : '';
+        let adminBtn = isCurrentAdmin() ? `<button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>` : '';
+        
+        let roleDisplay = "عميل";
+        if (isOwner()) roleDisplay = "المالك";
+        else if (currentUser.email.toLowerCase() === DEPUTY_EMAIL) roleDisplay = "نائب المالك";
+        else if (currentUser.role === 'seller') roleDisplay = "بائع";
+
         nav.innerHTML = `
           ${addBtn}
-          <span style="font-size:0.85rem; color:#94A3B8;">مرحباً، ${currentUser.name} (${currentUser.role === 'seller' ? 'بائع' : 'عميل'})</span>
+          <span style="font-size:0.85rem; color:#94A3B8;">مرحباً، ${currentUser.name} (${roleDisplay})</span>
+          ${adminBtn}
           <button class="btn btn-outline" onclick="logout()">خروج</button>
-          <button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>
         `;
       } else {
         nav.innerHTML = `
           <button class="btn btn-primary" onclick="openModal('authModal')">تسجيل الدخول</button>
-          <button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>
         `;
       }
     }
@@ -253,10 +284,14 @@
 
     function handleAuth(e) {
       e.preventDefault();
-      const email = document.getElementById('authEmail').value.trim();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const pass = document.getElementById('authPass').value.trim();
 
       if (isRegisterMode) {
+        if (users.find(u => u.email.toLowerCase() === email)) {
+          alert('البريد مسجل مسبقاً!');
+          return;
+        }
         const name = document.getElementById('authName').value.trim();
         const role = document.getElementById('authRole').value;
         const newUser = { name, email, pass, role, date: new Date().toLocaleDateString('ar-SA') };
@@ -264,11 +299,11 @@
         localStorage.setItem('sharestore_users', JSON.stringify(users));
         currentUser = newUser;
       } else {
-        const found = users.find(u => u.email === email && u.pass === pass);
+        const found = users.find(u => u.email.toLowerCase() === email && u.pass === pass);
         if (found) {
           currentUser = found;
         } else {
-          alert('البيانات غير صحيحة، أو الحساب غير موجود. اضغط على "حساب جديد" لإنشاء حساب.');
+          alert('البريد أو كلمة المرور غير صحيحة!');
           return;
         }
       }
@@ -285,27 +320,36 @@
     }
 
     function openAdminPanel() {
-      const pass = prompt("أدخل رمز دخول المسؤول (الرقم الافتراضي: 123456):");
-      if (pass === ADMIN_SECRET) {
-        const tbody = document.getElementById('usersTableBody');
-        tbody.innerHTML = '';
-        if(users.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا يوجد مسجلين حتى الآن</td></tr>';
-        } else {
-          users.forEach(u => {
-            tbody.innerHTML += `
-              <tr>
-                <td>${u.name}</td>
-                <td>${u.email}</td>
-                <td><strong style="color:${u.role === 'seller' ? '#A78BFA' : '#38BDF8'}">${u.role === 'seller' ? 'بائع' : 'عميل'}</strong></td>
-                <td>${u.date || '-'}</td>
-              </tr>
-            `;
-          });
-        }
-        openModal('adminModal');
-      } else if (pass !== null) {
-        alert("رمز الدخول غير صحيح!");
+      if (!isCurrentAdmin()) return;
+
+      document.getElementById('addAdminSection').style.display = isOwner() ? 'block' : 'none';
+
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        let tag = u.role === 'seller' ? 'بائع' : (u.role === 'owner' ? 'المالك' : (u.role === 'deputy' ? 'نائب' : 'عميل'));
+        tbody.innerHTML += `
+          <tr>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td><strong style="color:${u.role === 'seller' || u.role === 'owner' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
+            <td>${u.date || '-'}</td>
+          </tr>
+        `;
+      });
+      openModal('adminModal');
+    }
+
+    function addNewAdmin() {
+      const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
+      if (!email) return;
+      if (!adminList.includes(email)) {
+        adminList.push(email);
+        localStorage.setItem('sharestore_admins', JSON.stringify(adminList));
+        alert('تمت إضافة الإداري بنجاح!');
+        document.getElementById('newAdminEmail').value = '';
+      } else {
+        alert('هذا البريد مسجل كإداري مسبقاً!');
       }
     }
 
