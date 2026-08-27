@@ -15,6 +15,8 @@
       --text-muted: #94A3B8;
       --whatsapp: #25D366;
       --telegram: #0088CC;
+      --danger: #EF4444;
+      --success: #22C55E;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
@@ -45,6 +47,8 @@
     .btn-primary:hover { background-color: var(--primary-hover); }
     .btn-outline { background: transparent; border: 1px solid var(--primary); color: white; }
     .btn-admin { background: #334155; color: #F8FAFC; }
+    .btn-danger { background-color: var(--danger); color: white; }
+    .btn-success { background-color: var(--success); color: white; }
 
     .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
 
@@ -83,7 +87,7 @@
 
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
     .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
-    .modal-content.wide { max-width: 750px; }
+    .modal-content.wide { max-width: 850px; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
@@ -147,7 +151,34 @@
     </div>
   </div>
 
-  <!-- نافذة إضافة منتج (خاصة بالبائع والمسؤولين) -->
+  <!-- نافذة التحقق من الرمز (OTP 60 ثانية) -->
+  <div class="modal" id="otpModal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 10px; color: var(--primary);">تأكيد رمز التحقق (OTP)</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">أدخل رمز التحقق المكون من 6 أرقام لتفعيل الحساب.</p>
+      
+      <div id="demoOtpBox" style="background:#0F172A; border:1px dashed var(--primary); padding:10px; border-radius:6px; margin-bottom:15px; text-align:center;">
+        <span style="font-size:0.8rem; color:#94A3B8;">رمز التأكيد الخاص بك هو:</span>
+        <strong id="generatedCodeDisplay" style="font-size:1.2rem; color:#4ADE80; letter-spacing:3px; display:block; margin-top:4px;"></strong>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="enteredOtp" maxlength="6" placeholder="أدخل الـ 6 أرقام هنا" style="text-align:center; font-size:1.2rem; letter-spacing:4px;" required>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:0.85rem;">
+        <span style="color:var(--text-muted);">الوقت المتبقي:</span>
+        <strong id="timerDisplay" style="color:#EF4444; font-size:1rem;">60 ثانية</strong>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="verifyOtp()">تأكيد وتفعيل الحساب</button>
+        <button type="button" class="btn btn-admin" onclick="closeModal('otpModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة منتج -->
   <div class="modal" id="productModal">
     <div class="modal-content">
       <h3 style="margin-bottom: 15px;">إضافة خدمة / منتج جديد</h3>
@@ -180,16 +211,16 @@
     </div>
   </div>
 
-  <!-- لوحة تحكم الإدارة (تظهر فقط للمالك والنائب) -->
+  <!-- لوحة تحكم الإدارة الشاملة -->
   <div class="modal" id="adminModal">
     <div class="modal-content wide">
-      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين</h3>
+      <h3 style="margin-bottom: 10px; color: var(--primary);">لوحة تحكم المسؤولين (إدارة المستخدمين والحظر)</h3>
       
       <!-- إضافة إداري جديد (خاصة بالمالك فقط) -->
       <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
         <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
         <div style="display:flex; gap:8px;">
-          <input type="email" id="newAdminEmail" placeholder="البريد الإلكتروني للإداري" style="flex:1; padding:8px; background:#1E293B; border:1px solid #334155; color:white; border-radius:6px;">
+          <input type="email" id="newAdminEmail" placeholder="البريد الإلكتروني للإداري الجديد" style="flex:1; padding:8px; background:#1E293B; border:1px solid #334155; color:white; border-radius:6px;">
           <button class="btn btn-primary" onclick="addNewAdmin()">إضافة</button>
         </div>
       </div>
@@ -201,7 +232,9 @@
               <th>الاسم</th>
               <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
+              <th>الحالة</th>
               <th>تاريخ التسجيل</th>
+              <th>الإجراءات</th>
             </tr>
           </thead>
           <tbody id="usersTableBody"></tbody>
@@ -214,19 +247,21 @@
   </div>
 
   <script>
-    const OWNER_EMAIL = "erf881@gmail.com";
+    const OWNER_EMAIL = "erf8811@gmail.com";
     const DEPUTY_EMAIL = "ftb7788@gmail.com";
 
-    // قائمة الإداريين الافتراضية
     let adminList = JSON.parse(localStorage.getItem('sharestore_admins')) || [OWNER_EMAIL, DEPUTY_EMAIL];
 
     let users = JSON.parse(localStorage.getItem('sharestore_users')) || [
-      { name: "المالك (فهد)", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", date: "2026/08/27" },
-      { name: "النائب", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", date: "2026/08/27" }
+      { name: "المالك (فهد)", email: OWNER_EMAIL, pass: "FaFa@1122", role: "owner", banned: false, date: "2026/08/27" },
+      { name: "النائب", email: DEPUTY_EMAIL, pass: "FaFa@1122", role: "deputy", banned: false, date: "2026/08/27" }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
     let isRegisterMode = false;
+    let pendingUser = null;
+    let currentOtpCode = "";
+    let otpTimerInterval = null;
 
     let products = JSON.parse(localStorage.getItem('sharestore_products')) || [
       {
@@ -289,28 +324,72 @@
 
       if (isRegisterMode) {
         if (users.find(u => u.email.toLowerCase() === email)) {
-          alert('البريد مسجل مسبقاً!');
+          alert('البريد الإلكتروني مسجل مسبقاً!');
           return;
         }
         const name = document.getElementById('authName').value.trim();
         const role = document.getElementById('authRole').value;
-        const newUser = { name, email, pass, role, date: new Date().toLocaleDateString('ar-SA') };
-        users.push(newUser);
-        localStorage.setItem('sharestore_users', JSON.stringify(users));
-        currentUser = newUser;
+        
+        pendingUser = { name, email, pass, role, banned: false, date: new Date().toLocaleDateString('ar-SA') };
+        closeModal('authModal');
+        startOtpFlow();
       } else {
         const found = users.find(u => u.email.toLowerCase() === email && u.pass === pass);
-        if (found) {
-          currentUser = found;
-        } else {
+        if (!found) {
           alert('البريد أو كلمة المرور غير صحيحة!');
           return;
         }
+        if (found.banned) {
+          alert('عذراً، تم حظر هذا الحساب من قبل إدارة المنصة!');
+          return;
+        }
+        currentUser = found;
+        localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+        closeModal('authModal');
+        updateNav();
       }
+    }
 
-      localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-      closeModal('authModal');
-      updateNav();
+    function startOtpFlow() {
+      currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('generatedCodeDisplay').innerText = currentOtpCode;
+      document.getElementById('enteredOtp').value = '';
+      openModal('otpModal');
+
+      let timeLeft = 60;
+      document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+      if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+      otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timerDisplay').innerText = `${timeLeft} ثانية`;
+        if (timeLeft <= 0) {
+          clearInterval(otpTimerInterval);
+          alert('انتهت صلاحية رمز التحقق (60 ثانية). يرجى إعادة المحاولة.');
+          closeModal('otpModal');
+          currentOtpCode = "";
+        }
+      }, 1000);
+    }
+
+    function verifyOtp() {
+      const entered = document.getElementById('enteredOtp').value.trim();
+      if (!currentOtpCode) {
+        alert('انتهت صلاحية الرمز، يرجى إعادة التسجيل.');
+        return;
+      }
+      if (entered === currentOtpCode) {
+        clearInterval(otpTimerInterval);
+        users.push(pendingUser);
+        localStorage.setItem('sharestore_users', JSON.stringify(users));
+        currentUser = pendingUser;
+        localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
+        closeModal('otpModal');
+        alert('تم تأكيد الحساب بنجاح!');
+        updateNav();
+      } else {
+        alert('الرمز الذي أدخلته غير صحيح!');
+      }
     }
 
     function logout() {
@@ -326,18 +405,33 @@
 
       const tbody = document.getElementById('usersTableBody');
       tbody.innerHTML = '';
-      users.forEach(u => {
+      users.forEach((u, index) => {
         let tag = u.role === 'seller' ? 'بائع' : (u.role === 'owner' ? 'المالك' : (u.role === 'deputy' ? 'نائب' : 'عميل'));
+        let isProtected = u.role === 'owner' || u.role === 'deputy';
+        let banBtn = isProtected ? `<span style="color:#64748B;">محمي</span>` : `
+          <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleBanUser(${index})">
+            ${u.banned ? 'إلغاء الحظر' : 'حظر الحساب'}
+          </button>
+        `;
+
         tbody.innerHTML += `
           <tr>
             <td>${u.name}</td>
             <td>${u.email}</td>
             <td><strong style="color:${u.role === 'seller' || u.role === 'owner' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
+            <td><span style="color:${u.banned ? '#EF4444' : '#22C55E'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ✅'}</span></td>
             <td>${u.date || '-'}</td>
+            <td>${banBtn}</td>
           </tr>
         `;
       });
       openModal('adminModal');
+    }
+
+    function toggleBanUser(index) {
+      users[index].banned = !users[index].banned;
+      localStorage.setItem('sharestore_users', JSON.stringify(users));
+      openAdminPanel();
     }
 
     function addNewAdmin() {
