@@ -7,33 +7,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0F172A;
-      --card-bg: #1E293B;
-      --primary: #7C3AED;
-      --primary-hover: #6D28D9;
+      --bg-dark: #0B0F19;
+      --card-bg: #151F32;
+      --card-border: #24344D;
+      --primary: #8B5CF6;
+      --primary-hover: #7C3AED;
       --text-main: #FFFFFF;
       --text-muted: #94A3B8;
-      --whatsapp: #25D366;
-      --telegram: #0088CC;
+      --whatsapp: #22C55E;
+      --telegram: #0284C7;
       --danger: #EF4444;
-      --success: #22C55E;
+      --success: #10B981;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 60px; }
+    body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 60px; min-height: 100vh; }
 
+    /* Header */
     header {
       background-color: var(--card-bg);
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    .logo-container { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.1rem; }
-    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.15rem; color: #fff; text-decoration: none; }
+    .brand span.icon { font-size: 1.4rem; color: var(--primary); }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+    /* Buttons */
     .btn {
       padding: 8px 14px;
       border-radius: 8px;
@@ -41,173 +48,268 @@
       cursor: pointer;
       font-weight: bold;
       font-size: 0.85rem;
-      transition: 0.2s;
+      transition: 0.2s all;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     .btn-primary { background-color: var(--primary); color: white; }
-    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
     .btn-outline { background: transparent; border: 1px solid var(--primary); color: white; }
-    .btn-admin { background: #334155; color: #F8FAFC; }
+    .btn-outline:hover { background: rgba(139, 92, 246, 0.1); }
+    .btn-admin { background: #1E293B; border: 1px solid #334155; color: #F8FAFC; }
+    .btn-admin:hover { background: #334155; }
     .btn-danger { background-color: var(--danger); color: white; }
     .btn-success { background-color: var(--success); color: white; }
 
-    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+    /* Main Container */
+    .container { max-width: 950px; margin: 25px auto; padding: 0 15px; }
 
-    .disclaimer {
-      background-color: rgba(124, 58, 237, 0.1);
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      padding: 12px;
-      border-radius: 8px;
+    .banner-alert {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 12px 16px;
+      border-radius: 10px;
       font-size: 0.85rem;
       color: #E2E8F0;
       margin-bottom: 20px;
+      line-height: 1.6;
     }
 
-    .search-bar {
+    .search-input {
       width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid #334155;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
       background-color: var(--card-bg);
       color: white;
-      font-size: 1rem;
+      font-size: 0.95rem;
       outline: none;
       margin-bottom: 25px;
+      transition: 0.2s border;
+    }
+    .search-input:focus { border-color: var(--primary); }
+
+    /* Cards Grid */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px; }
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: 0.2s transform, 0.2s border;
+    }
+    .card:hover { border-color: #475569; }
+
+    .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .product-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .product-price { color: #34D399; font-weight: 900; font-size: 1.15rem; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 6px; }
+    .seller-tag { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; }
+    .product-desc { font-size: 0.9rem; color: #CBD5E1; margin-bottom: 16px; line-height: 1.5; white-space: pre-wrap; }
+
+    .admin-seller-box {
+      background: #0B0F19;
+      border: 1px solid #334155;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: #94A3B8;
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; border: 1px solid #334155; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-    .product-title { font-size: 1.1rem; font-weight: bold; }
-    .product-price { color: #4ADE80; font-weight: bold; font-size: 1.1rem; }
-    .seller-info { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 10px; }
-    .admin-info-badge { background: #0F172A; border: 1px solid #475569; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: #CBD5E1; margin: 8px 0; }
-    .product-desc { font-size: 0.9rem; color: #CBD5E1; margin-bottom: 14px; }
-    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-action { flex: 1; padding: 9px; border-radius: 6px; text-decoration: none; color: white; text-align: center; font-size: 0.85rem; font-weight: bold; min-width: 80px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
+    /* Action Buttons */
+    .actions-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+    .action-link {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      min-width: 80px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+    }
     .btn-wa { background-color: var(--whatsapp); }
     .btn-tg { background-color: var(--telegram); }
-    .btn-del { background-color: #EF4444; }
-    .btn-ban-quick { background-color: #991B1B; }
-    .btn-login-to-order { background: linear-gradient(135deg, #7C3AED, #4F46E5); width: 100%; padding: 10px; font-size: 0.9rem; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-login-to-order:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-del { background-color: var(--danger); }
+    .btn-ban-direct { background-color: #991B1B; }
 
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; z-index: 100; }
-    .modal-content { background-color: var(--card-bg); padding: 20px; border-radius: 12px; max-width: 450px; width: 100%; border: 1px solid var(--primary); }
-    .modal-content.wide { max-width: 900px; max-height: 90vh; overflow-y: auto; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: white; outline: none; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .btn-lock-prompt {
+      background: linear-gradient(135deg, var(--primary), #6366F1);
+      width: 100%;
+      padding: 12px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background-color: var(--card-bg);
+      padding: 24px;
+      border-radius: 14px;
+      max-width: 460px;
+      width: 100%;
+      border: 1px solid var(--primary);
+    }
+    .modal-box.wide { max-width: 900px; max-height: 90vh; overflow-y: auto; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      background: #0B0F19;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
+
+    /* Tables */
     table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-    th, td { padding: 10px; border: 1px solid #334155; text-align: right; }
-    th { background: #0F172A; color: var(--primary); }
+    th, td { padding: 12px 10px; border: 1px solid #334155; text-align: right; }
+    th { background: #0B0F19; color: var(--primary); }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo-container">
-      <span>♾️</span>
+    <a href="#" class="brand">
+      <span class="icon">♾️</span>
       <span>شير ستور | SHARE STORE</span>
-    </div>
-    <div class="header-actions" id="authNav"></div>
+    </a>
+    <div class="header-actions" id="navArea"></div>
   </header>
 
   <div class="container">
-    <div class="disclaimer">
-      ⚠️ <strong>تنبيه:</strong> المنصة وسيط إعلاني فقط. التعامل المالي والتسليم مسؤولية البائع والمشتري مباشرة.
+    <div class="banner-alert">
+      ⚠️ <strong>إخلاء مسؤولية:</strong> المنصة وسيط إعلاني مباشر. كافة التعاملات المالية وتسليم الخدمات تتم بين البائع والمشتري بشكل مباشر.
     </div>
 
-    <input type="text" id="searchInput" class="search-bar" placeholder="ابحث عن اشتراك، لعبة، أو خدمة..." onkeyup="filterProducts()">
+    <input type="text" id="searchBar" class="search-input" placeholder="ابحث عن اشتراك، لعبة، أو خدمة معينة..." oninput="onSearchChange()">
 
-    <div class="products-grid" id="productsList">
-      <div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:30px;">جاري تحميل المنتجات السحابية...</div>
+    <div class="products-grid" id="productsContainer">
+      <div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:40px;">جاري تحميل العروض السحابية...</div>
     </div>
   </div>
 
-  <!-- نافذة تسجيل الدخول / حساب جديد -->
-  <div class="modal" id="authModal">
-    <div class="modal-content">
-      <h3 id="authTitle" style="margin-bottom: 15px;">تسجيل الدخول</h3>
-      <form id="authForm" onsubmit="handleAuth(event)">
-        <div class="form-group" id="nameFieldGroup" style="display: none;">
-          <label>الاسم الكامل *</label>
-          <input type="text" id="authName" placeholder="اسمك أو اسم متجرك">
+  <!-- نافذة الحساب والدخول -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+      <h3 id="authTitle" style="margin-bottom: 18px; color: #fff;">تسجيل الدخول</h3>
+      <form id="authForm" onsubmit="submitAuthForm(event)">
+        
+        <div class="form-group" id="nameGroup" style="display: none;">
+          <label>الاسم أو اسم المتجر *</label>
+          <input type="text" id="authNameInput" placeholder="مثال: متجر الرقميات">
         </div>
-        <div class="form-group" id="phoneFieldGroup" style="display: none;">
-          <label>رقم الهاتف * (سري للإدارة)</label>
-          <input type="tel" id="authPhone" placeholder="05xxxxxxxx">
+
+        <div class="form-group" id="phoneGroup" style="display: none;">
+          <label>رقم الجوال * (سري للإدارة)</label>
+          <input type="tel" id="authPhoneInput" placeholder="05xxxxxxxx">
         </div>
+
         <div class="form-group">
           <label>البريد الإلكتروني *</label>
-          <input type="email" id="authEmail" required placeholder="example@mail.com">
+          <input type="email" id="authEmailInput" required placeholder="example@mail.com">
         </div>
+
         <div class="form-group">
           <label>كلمة المرور *</label>
-          <input type="password" id="authPass" required placeholder="******">
+          <input type="password" id="authPassInput" required placeholder="••••••••">
         </div>
-        <div class="form-group" id="roleFieldGroup" style="display: none;">
+
+        <div class="form-group" id="roleGroup" style="display: none;">
           <label>نوع الحساب *</label>
-          <select id="authRole">
-            <option value="customer">عميل (تصفح وشراء)</option>
-            <option value="seller">بائع (عرض ونشر خدمات)</option>
+          <select id="authRoleInput">
+            <option value="customer">عميل (تصفح وتواصل للشراء)</option>
+            <option value="seller">بائع (إضافة ونشر العروض والخدمات)</option>
           </select>
         </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex:1;" id="authSubmitBtn">متابعة</button>
-          <button type="button" class="btn btn-outline" onclick="toggleAuthMode()" id="toggleAuthBtn">حساب جديد</button>
-          <button type="button" class="btn btn-admin" onclick="closeModal('authModal')">إغلاق</button>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="authSubmitButton">تسجيل الدخول</button>
+          <button type="button" class="btn btn-outline" onclick="toggleAuthMode()" id="authToggleButton">حساب جديد</button>
+          <button type="button" class="btn btn-admin" onclick="hideModal('authModal')">إغلاق</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- نافذة إضافة منتج -->
-  <div class="modal" id="productModal">
-    <div class="modal-content">
-      <h3 style="margin-bottom: 15px;">إضافة خدمة / منتج جديد</h3>
-      <form onsubmit="saveProduct(event)">
+  <!-- نافذة إضافة إعلان جديد -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 18px; color: var(--primary);">+ نشر إعلان جديد</h3>
+      <form onsubmit="submitNewProduct(event)">
         <div class="form-group">
-          <label>اسم الخدمة / المنتج *</label>
-          <input type="text" id="pTitle" required placeholder="يوتيوب بريميوم سنة">
+          <label>عنوان الخدمة / المنتج *</label>
+          <input type="text" id="prodTitle" required placeholder="مثال: يوتيوب بريميوم 12 شهر">
         </div>
         <div class="form-group">
           <label>السعر *</label>
-          <input type="text" id="pPrice" required placeholder="60 ريال">
+          <input type="text" id="prodPrice" required placeholder="مثال: 55 ريال">
         </div>
         <div class="form-group">
-          <label>رقم الواتساب للتواصل *</label>
-          <input type="text" id="pWhatsapp" required placeholder="9665xxxxxxxx">
+          <label>رقم الواتساب للتواصل * (بالصيغة الدولية أو المحلية)</label>
+          <input type="text" id="prodWhatsapp" required placeholder="05xxxxxxxx أو 9665xxxxxxxx">
         </div>
         <div class="form-group">
-          <label>يوزر تيليجرام (اختياري)</label>
-          <input type="text" id="pTelegram" placeholder="username">
+          <label>يوزر التيلجرام (اختياري)</label>
+          <input type="text" id="prodTelegram" placeholder="اسم المستخدم بدون @">
         </div>
         <div class="form-group">
-          <label>تفاصيل الخدمة *</label>
-          <textarea id="pDesc" rows="2" required placeholder="شروط وضمان الخدمة"></textarea>
+          <label>تفاصيل وشروط العرض والضمان *</label>
+          <textarea id="prodDesc" rows="3" required placeholder="اكتب تفاصيل الخدمة ومدة الضمان وطريقة التسليم..."></textarea>
         </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex:1;" id="saveProductBtn">نشر الإعلان</button>
-          <button type="button" class="btn btn-admin" onclick="closeModal('productModal')">إلغاء</button>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="publishBtn">نشر الإعلان فوراً</button>
+          <button type="button" class="btn btn-admin" onclick="hideModal('addModal')">إلغاء</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- لوحة تحكم المسؤولين -->
-  <div class="modal" id="adminModal">
-    <div class="modal-content wide">
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-box wide">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="color: var(--primary);">⚙️ لوحة إدارة الحسابات السحابية</h3>
-        <button class="btn btn-danger" onclick="closeModal('adminModal')">✕ إغلاق</button>
+        <h3 style="color: var(--primary);">⚙️ لوحة إدارة المستخدمين والحظر السحابي</h3>
+        <button class="btn btn-danger" onclick="hideModal('adminModal')">✕ إغلاق</button>
       </div>
-      
-      <div id="addAdminSection" style="display:none; background:#0F172A; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
-        <h4 style="font-size:0.9rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (صلاحية المالك)</h4>
+
+      <div id="addAdminContainer" style="display:none; background:#0B0F19; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #334155;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px; color:#A78BFA;">إضافة إداري جديد (خاص بالمالك)</h4>
         <div style="display:flex; gap:8px;">
-          <input type="email" id="newAdminEmail" placeholder="البريد الإلكتروني للإداري الجديد" style="flex:1; padding:8px; background:#1E293B; border:1px solid #334155; color:white; border-radius:6px;">
-          <button class="btn btn-primary" onclick="addNewAdmin()">إضافة</button>
+          <input type="email" id="newAdminMail" placeholder="البريد الإلكتروني للإداري" style="flex:1; padding:8px; background:#151F32; border:1px solid #334155; color:white; border-radius:6px;">
+          <button class="btn btn-primary" onclick="promoteNewAdmin()">إضافة</button>
         </div>
       </div>
 
@@ -216,7 +318,7 @@
           <thead>
             <tr>
               <th>الاسم</th>
-              <th>رقم الهاتف</th>
+              <th>الجوال</th>
               <th>البريد الإلكتروني</th>
               <th>نوع الحساب</th>
               <th>الحالة</th>
@@ -224,340 +326,262 @@
               <th>إجراء الحظر</th>
             </tr>
           </thead>
-          <tbody id="usersTableBody"></tbody>
+          <tbody id="adminTableContent"></tbody>
         </table>
       </div>
     </div>
   </div>
 
   <script>
-    const DB_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
+    // الرابط السحابي المباشر
+    const CLOUD_URL = "https://sharestore-2e071-default-rtdb.firebaseio.com";
 
-    const OWNER_EMAIL = "erf8811@gmail.com";
-    const DEPUTY_EMAIL = "ftb7788@gmail.com";
+    const PRIMARY_OWNER = "erf8811@gmail.com";
+    const DEPUTY_OWNER = "ftb7788@gmail.com";
 
-    let adminList = [OWNER_EMAIL, DEPUTY_EMAIL];
-    let usersList = [];
-    let productsListGlobal = [];
+    let adminEmails = [PRIMARY_OWNER, DEPUTY_OWNER];
+    let loadedUsers = [];
+    let loadedProducts = [];
 
-    let currentUser = JSON.parse(localStorage.getItem('sharestore_current_user')) || null;
-    let isRegisterMode = false;
+    let activeUser = JSON.parse(localStorage.getItem('sharestore_user_session')) || null;
+    let isRegisterTab = false;
 
-    async function loadCloudData() {
+    // جلب البيانات السحابية الشاملة
+    async function syncCloudData() {
       try {
-        const prodRes = await fetch(`${DB_URL}/products.json`);
+        const [prodRes, usersRes, adminRes] = await Promise.all([
+          fetch(`${CLOUD_URL}/products.json`),
+          fetch(`${CLOUD_URL}/users.json`),
+          fetch(`${CLOUD_URL}/admins.json`)
+        ]);
+
         const prodData = await prodRes.json();
-        productsListGlobal = [];
+        loadedProducts = [];
         if (prodData) {
           for (let key in prodData) {
-            productsListGlobal.push({ id: key, ...prodData[key] });
+            loadedProducts.push({ id: key, ...prodData[key] });
           }
         }
 
-        const usersRes = await fetch(`${DB_URL}/users.json`);
         const usersData = await usersRes.json();
-        usersList = [];
+        loadedUsers = [];
         if (usersData) {
           for (let key in usersData) {
-            usersList.push({ id: key, ...usersData[key] });
+            loadedUsers.push({ id: key, ...usersData[key] });
           }
         }
 
-        const adminsRes = await fetch(`${DB_URL}/admins.json`);
-        const adminsData = await adminsRes.json();
-        if (adminsData && Array.isArray(adminsData)) {
-          adminList = adminsData;
+        const adminData = await adminRes.json();
+        if (adminData && Array.isArray(adminData)) {
+          adminEmails = adminData;
         }
 
-        renderProducts(productsListGlobal);
-      } catch (err) {
-        console.error("Cloud DB load error:", err);
+        renderProductsList(loadedProducts);
+      } catch (e) {
+        console.error("Sync Error:", e);
       }
     }
 
-    function isCurrentAdmin() {
-      if (!currentUser) return false;
-      const email = currentUser.email.toLowerCase();
-      return adminList.map(e => e.toLowerCase()).includes(email) || email === OWNER_EMAIL || email === DEPUTY_EMAIL;
+    function checkAdminStatus() {
+      if (!activeUser || !activeUser.email) return false;
+      const em = activeUser.email.toLowerCase();
+      return adminEmails.map(a => a.toLowerCase()).includes(em) || em === PRIMARY_OWNER || em === DEPUTY_OWNER;
     }
 
-    function isOwner() {
-      return currentUser && currentUser.email.toLowerCase() === OWNER_EMAIL;
+    function isOwnerUser() {
+      return activeUser && activeUser.email.toLowerCase() === PRIMARY_OWNER;
     }
 
-    function updateNav() {
-      const nav = document.getElementById('authNav');
-      if (currentUser) {
-        const canSell = currentUser.role === 'seller' || isCurrentAdmin();
-        let addBtn = canSell ? `<button class="btn btn-primary" onclick="openModal('productModal')">+ أضف إعلانك</button>` : '';
-        let adminBtn = isCurrentAdmin() ? `<button class="btn btn-admin" onclick="openAdminPanel()">⚙️ الإدارة</button>` : '';
-        
-        let roleDisplay = "عميل";
-        if (isOwner()) roleDisplay = "المالك";
-        else if (currentUser.email.toLowerCase() === DEPUTY_EMAIL) roleDisplay = "نائب المالك";
-        else if (currentUser.role === 'seller') roleDisplay = "بائع";
+    // تحديث شريط التنقل العلوي
+    function refreshNavigation() {
+      const nav = document.getElementById('navArea');
+      if (activeUser) {
+        const canPublish = activeUser.role === 'seller' || checkAdminStatus();
+        let addBtn = canPublish ? `<button class="btn btn-primary" onclick="showModal('addModal')">+ أضف إعلانك</button>` : '';
+        let adminBtn = checkAdminStatus() ? `<button class="btn btn-admin" onclick="openAdminDashboard()">⚙️ الإدارة</button>` : '';
+
+        let roleText = "عميل";
+        if (isOwnerUser()) roleText = "المالك";
+        else if (activeUser.email.toLowerCase() === DEPUTY_OWNER) roleText = "نائب المالك";
+        else if (activeUser.role === 'seller') roleText = "بائع";
 
         nav.innerHTML = `
           ${addBtn}
-          <span style="font-size:0.85rem; color:#94A3B8;">مرحباً، ${currentUser.name} (${roleDisplay})</span>
+          <span style="font-size:0.85rem; color:#94A3B8;">مرحباً، ${activeUser.name} (${roleText})</span>
           ${adminBtn}
-          <button class="btn btn-outline" onclick="logout()">خروج</button>
+          <button class="btn btn-outline" onclick="performLogout()">خروج</button>
         `;
       } else {
         nav.innerHTML = `
-          <button class="btn btn-primary" onclick="openModal('authModal')">تسجيل الدخول</button>
+          <button class="btn btn-primary" onclick="showModal('authModal')">تسجيل الدخول</button>
         `;
       }
     }
 
     function toggleAuthMode() {
-      isRegisterMode = !isRegisterMode;
-      document.getElementById('authTitle').innerText = isRegisterMode ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
-      document.getElementById('nameFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
-      document.getElementById('phoneFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
-      document.getElementById('roleFieldGroup').style.display = isRegisterMode ? 'block' : 'none';
-      document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'لدي حساب بالفعل' : 'حساب جديد';
-      document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'تسجيل وتفعيل الحساب فوراً' : 'تسجيل الدخول';
+      isRegisterTab = !isRegisterTab;
+      document.getElementById('authTitle').innerText = isRegisterTab ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
+      document.getElementById('nameGroup').style.display = isRegisterTab ? 'block' : 'none';
+      document.getElementById('phoneGroup').style.display = isRegisterTab ? 'block' : 'none';
+      document.getElementById('roleGroup').style.display = isRegisterTab ? 'block' : 'none';
+      document.getElementById('authToggleButton').innerText = isRegisterTab ? 'لدي حساب بالفعل' : 'حساب جديد';
+      document.getElementById('authSubmitButton').innerText = isRegisterTab ? 'تسجيل وتفعيل الحساب' : 'تسجيل الدخول';
     }
 
-    async function handleAuth(e) {
+    // معالجة تسجيل الدخول / إنشاء حساب
+    async function submitAuthForm(e) {
       e.preventDefault();
-      const email = document.getElementById('authEmail').value.trim().toLowerCase();
-      const pass = document.getElementById('authPass').value.trim();
-      const btn = document.getElementById('authSubmitBtn');
+      const email = document.getElementById('authEmailInput').value.trim().toLowerCase();
+      const pass = document.getElementById('authPassInput').value.trim();
+      const btn = document.getElementById('authSubmitButton');
 
       btn.disabled = true;
       btn.innerText = 'جاري المعالجة...';
 
-      await loadCloudData();
+      await syncCloudData();
 
-      if (isRegisterMode) {
-        if (usersList.find(u => u.email && u.email.toLowerCase() === email)) {
+      if (isRegisterTab) {
+        if (loadedUsers.find(u => u.email && u.email.toLowerCase() === email)) {
           alert('البريد الإلكتروني مسجل مسبقاً! يرجى تسجيل الدخول.');
           btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
+          btn.innerText = 'تسجيل وتفعيل الحساب';
           return;
         }
-        const name = document.getElementById('authName').value.trim();
-        const phone = document.getElementById('authPhone').value.trim();
-        const role = document.getElementById('authRole').value;
 
-        if (!phone) {
-          alert('يرجى كتابة رقم الهاتف.');
+        const name = document.getElementById('authNameInput').value.trim();
+        const phone = document.getElementById('authPhoneInput').value.trim();
+        const role = document.getElementById('authRoleInput').value;
+
+        if (!name || !phone) {
+          alert('يرجى ملء كافة الحقول المطلوبة.');
           btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
+          btn.innerText = 'تسجيل وتفعيل الحساب';
           return;
         }
-        
-        const newUser = { 
-          name, 
-          phone, 
-          email, 
-          pass, 
-          role, 
-          banned: false, 
-          date: new Date().toLocaleDateString('ar-SA') 
+
+        const newAccount = {
+          name,
+          phone,
+          email,
+          pass,
+          role,
+          banned: false,
+          date: new Date().toLocaleDateString('ar-SA')
         };
 
         try {
-          const res = await fetch(`${DB_URL}/users.json`, {
+          const res = await fetch(`${CLOUD_URL}/users.json`, {
             method: 'POST',
-            body: JSON.stringify(newUser)
+            body: JSON.stringify(newAccount)
           });
-          const data = await res.json();
-          newUser.id = data.name;
+          const resData = await res.json();
+          newAccount.id = resData.name;
 
-          currentUser = newUser;
-          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-          closeModal('authModal');
+          activeUser = newAccount;
+          localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
+          hideModal('authModal');
           alert('🎉 تم إنشاء وتفعيل حسابك بنجاح!');
-          updateNav();
-          loadCloudData();
+          refreshNavigation();
+          renderProductsList(loadedProducts);
         } catch (err) {
-          alert('تعذر حفظ الحساب، يرجى المحاولة مرة أخرى.');
+          alert('حدث خطأ أثناء حفظ البيانات السحابية.');
         } finally {
           btn.disabled = false;
-          btn.innerText = 'تسجيل وتفعيل الحساب فوراً';
+          btn.innerText = 'تسجيل وتفعيل الحساب';
         }
       } else {
-        if (email === OWNER_EMAIL && pass === "FaFa@1122") {
-          currentUser = { name: "المالك (فهد)", phone: "0500000000", email: OWNER_EMAIL, role: "owner", banned: false };
-          localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-          closeModal('authModal');
-          updateNav();
-          renderProducts(productsListGlobal);
+        // حساب المالك المباشر
+        if (email === PRIMARY_OWNER && pass === "FaFa@1122") {
+          activeUser = { name: "المالك (فهد)", phone: "0500000000", email: PRIMARY_OWNER, role: "owner", banned: false };
+          localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
+          hideModal('authModal');
+          refreshNavigation();
+          renderProductsList(loadedProducts);
           btn.disabled = false;
           btn.innerText = 'تسجيل الدخول';
           return;
         }
 
-        const found = usersList.find(u => u.email && u.email.toLowerCase() === email && u.pass === pass);
+        const found = loadedUsers.find(u => u.email && u.email.toLowerCase() === email && u.pass === pass);
         if (!found) {
-          alert('البريد أو كلمة المرور غير صحيحة!');
+          alert('البريد الإلكتروني أو كلمة المرور غير صحيحة!');
           btn.disabled = false;
           btn.innerText = 'تسجيل الدخول';
           return;
         }
+
         if (found.banned) {
-          alert('عذراً، تم حظر هذا الحساب من قبل إدارة المنصة!');
+          alert('⛔ تم حظر هذا الحساب من قِبل إدارة المنصة!');
           btn.disabled = false;
           btn.innerText = 'تسجيل الدخول';
           return;
         }
-        currentUser = found;
-        localStorage.setItem('sharestore_current_user', JSON.stringify(currentUser));
-        closeModal('authModal');
-        updateNav();
-        renderProducts(productsListGlobal);
+
+        activeUser = found;
+        localStorage.setItem('sharestore_user_session', JSON.stringify(activeUser));
+        hideModal('authModal');
+        refreshNavigation();
+        renderProductsList(loadedProducts);
         btn.disabled = false;
         btn.innerText = 'تسجيل الدخول';
       }
     }
 
-    function logout() {
-      currentUser = null;
-      localStorage.removeItem('sharestore_current_user');
-      updateNav();
-      renderProducts(productsListGlobal);
+    function performLogout() {
+      activeUser = null;
+      localStorage.removeItem('sharestore_user_session');
+      refreshNavigation();
+      renderProductsList(loadedProducts);
     }
 
-    async function openAdminPanel() {
-      if (!isCurrentAdmin()) return;
-      await loadCloudData();
-
-      document.getElementById('addAdminSection').style.display = isOwner() ? 'block' : 'none';
-
-      const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '';
-
-      if (usersList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين بعد.</td></tr>`;
-      }
-
-      usersList.forEach((u) => {
-        let tag = u.role === 'seller' ? 'بائع' : (u.role === 'owner' ? 'المالك' : (u.role === 'deputy' ? 'نائب' : 'عميل'));
-        let isProtected = u.role === 'owner' || u.role === 'deputy' || (u.email && u.email.toLowerCase() === OWNER_EMAIL);
-        
-        let banBtn = isProtected ? `<span style="color:#64748B;">محمي (إدارة)</span>` : `
-          <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:6px 12px;" onclick="toggleBanUser('${u.id}', ${!u.banned})">
-            ${u.banned ? '✅ إلغاء الحظر' : '🚫 حظر الحساب'}
-          </button>
-        `;
-
-        tbody.innerHTML += `
-          <tr>
-            <td><strong>${u.name}</strong></td>
-            <td style="color:#F59E0B; font-weight:bold;">${u.phone || '-'}</td>
-            <td>${u.email}</td>
-            <td><strong style="color:${u.role === 'seller' ? '#A78BFA' : '#38BDF8'}">${tag}</strong></td>
-            <td><span style="color:${u.banned ? '#EF4444' : '#22C55E'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ومفعل ✅'}</span></td>
-            <td>${u.date || '-'}</td>
-            <td>${banBtn}</td>
-          </tr>
-        `;
-      });
-      openModal('adminModal');
-    }
-
-    async function toggleBanUser(userId, newStatus) {
-      if (!userId) {
-        alert('تعذر تحديد معرف المستخدم.');
-        return;
-      }
-      try {
-        await fetch(`${DB_URL}/users/${userId}.json`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ banned: newStatus })
-        });
-        alert(newStatus ? 'تم حظر المستخدم بنجاح!' : 'تم فك حظر المستخدم بنجاح!');
-        await loadCloudData();
-        if (document.getElementById('adminModal').style.display === 'flex') {
-          openAdminPanel();
-        }
-      } catch (err) {
-        alert('حدث خطأ أثناء تحديث حالة الحظر.');
-        console.error(err);
-      }
-    }
-
-    async function banSellerByEmail(sellerEmail) {
-      if (!sellerEmail) {
-        alert('لا يوجد بريد إلكتروني مسجل لهذا البائع.');
-        return;
-      }
-      const targetUser = usersList.find(u => u.email && u.email.toLowerCase() === sellerEmail.toLowerCase());
-      if (!targetUser) {
-        alert('لم يتم العثور على حساب البائع في قاعدة البيانات.');
-        return;
-      }
-      if (confirm(`هل أنت متأكد من حظر حساب البائع (${targetUser.name}) صاحب الإيميل (${targetUser.email})؟`)) {
-        await toggleBanUser(targetUser.id, true);
-      }
-    }
-
-    async function addNewAdmin() {
-      const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
-      if (!email) return;
-      if (!adminList.includes(email)) {
-        adminList.push(email);
-        await fetch(`${DB_URL}/admins.json`, {
-          method: 'PUT',
-          body: JSON.stringify(adminList)
-        });
-        alert('تمت إضافة الإداري سحابياً بنجاح!');
-        document.getElementById('newAdminEmail').value = '';
-      } else {
-        alert('هذا البريد مسجل كإداري مسبقاً!');
-      }
-    }
-
-    function renderProducts(list) {
-      const container = document.getElementById('productsList');
+    // عرض قائمة المنتجات
+    function renderProductsList(items) {
+      const container = document.getElementById('productsContainer');
       container.innerHTML = '';
 
-      if (list.length === 0) {
-        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:30px;">لا توجد إعلانات منشورة حالياً. كن أول من يضيف إعلاناً!</div>`;
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#94A3B8; padding:40px;">لا توجد عروض منشورة حالياً. كن أول من يضيف عرضاً!</div>`;
         return;
       }
 
-      list.forEach((p) => {
-        let actionArea = '';
+      items.forEach((p) => {
+        let actionContent = '';
 
-        if (currentUser) {
-          const msg = encodeURIComponent(`مرحباً، أود شراء: ${p.title} من شير ستور`);
-          const waLink = `https://wa.me/${p.whatsapp}?text=${msg}`;
-          const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram}" target="_blank" class="btn-action btn-tg">تيليجرام</a>` : '';
-          
-          let isSellerOwner = currentUser && p.sellerEmail && (currentUser.email.toLowerCase() === p.sellerEmail.toLowerCase());
-          let canDelete = isCurrentAdmin() || isSellerOwner;
-          let delBtn = canDelete && p.id ? `<button onclick="deleteProduct('${p.id}')" class="btn-action btn-del">🗑️ حذف</button>` : '';
+        if (activeUser) {
+          const rawPhone = (p.whatsapp || '').replace(/[^0-9]/g, '');
+          const msg = encodeURIComponent(`مرحباً، أود شراء الخدمة التالية: ${p.title} من منصة شير ستور`);
+          const waUrl = `https://wa.me/${rawPhone}?text=${msg}`;
+          const tgBtn = p.telegram ? `<a href="https://t.me/${p.telegram.replace('@', '')}" target="_blank" class="action-link btn-tg">تيليجرام</a>` : '';
 
-          let banBtnDirect = '';
-          if (isCurrentAdmin() && p.sellerEmail && p.sellerEmail.toLowerCase() !== OWNER_EMAIL) {
-            banBtnDirect = `<button onclick="banSellerByEmail('${p.sellerEmail}')" class="btn-action btn-ban-quick">🚫 حظر البائع</button>`;
+          const isOwnerOfProduct = activeUser && p.sellerEmail && (activeUser.email.toLowerCase() === p.sellerEmail.toLowerCase());
+          const canDelete = checkAdminStatus() || isOwnerOfProduct;
+          const deleteBtn = canDelete && p.id ? `<button onclick="deleteProductItem('${p.id}')" class="action-link btn-del">🗑️ حذف</button>` : '';
+
+          let banSellerBtn = '';
+          if (checkAdminStatus() && p.sellerEmail && p.sellerEmail.toLowerCase() !== PRIMARY_OWNER) {
+            banSellerBtn = `<button onclick="banSellerDirectly('${p.sellerEmail}')" class="action-link btn-ban-direct">🚫 حظر البائع</button>`;
           }
 
-          actionArea = `
-            <div class="action-buttons">
-              <a href="${waLink}" target="_blank" class="btn-action btn-wa">واتساب</a>
+          actionContent = `
+            <div class="actions-group">
+              <a href="${waUrl}" target="_blank" class="action-link btn-wa">واتساب</a>
               ${tgBtn}
-              ${delBtn}
-              ${banBtnDirect}
+              ${deleteBtn}
+              ${banSellerBtn}
             </div>
           `;
         } else {
-          actionArea = `
-            <button class="btn-login-to-order" onclick="openModal('authModal')">
+          actionContent = `
+            <button class="btn-lock-prompt" onclick="showModal('authModal')">
               🔒 سجل دخولك للطلب والتواصل
             </button>
           `;
         }
 
-        let adminSellerBadge = '';
-        if (isCurrentAdmin() && p.sellerEmail) {
-          adminSellerBadge = `
-            <div class="admin-info-badge">
+        let adminBadge = '';
+        if (checkAdminStatus() && p.sellerEmail) {
+          adminBadge = `
+            <div class="admin-seller-box">
               🔒 <strong>بيانات البائع للإدارة:</strong><br>
               الإيميل: ${p.sellerEmail} | الجوال: ${p.sellerPhone || p.whatsapp}
             </div>
@@ -567,77 +591,171 @@
         container.innerHTML += `
           <div class="card">
             <div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="product-header">
                 <div class="product-title">${p.title}</div>
                 <div class="product-price">${p.price}</div>
               </div>
-              <div class="seller-info">البائع: ${p.seller}</div>
-              ${adminSellerBadge}
+              <div class="seller-tag">البائع: <strong>${p.seller || 'معتمد'}</strong></div>
+              ${adminBadge}
               <div class="product-desc">${p.desc}</div>
             </div>
-            ${actionArea}
+            ${actionContent}
           </div>
         `;
       });
     }
 
-    async function deleteProduct(productId) {
-      if (!confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) return;
-      try {
-        await fetch(`${DB_URL}/products/${productId}.json`, { method: 'DELETE' });
-        alert("تم حذف الإعلان بنجاح!");
-        loadCloudData();
-      } catch (err) {
-        alert("حدث خطأ أثناء حذف المنتج.");
-      }
-    }
-
-    async function saveProduct(e) {
+    // إضافة منتج جديد
+    async function submitNewProduct(e) {
       e.preventDefault();
-      const btn = document.getElementById('saveProductBtn');
-      btn.innerText = 'جاري النشر السحابي...';
+      const btn = document.getElementById('publishBtn');
       btn.disabled = true;
+      btn.innerText = 'جاري النشر السحابي...';
 
-      const newP = {
-        title: document.getElementById('pTitle').value,
-        price: document.getElementById('pPrice').value,
-        seller: currentUser ? currentUser.name : "بائع معتمد",
-        sellerEmail: currentUser ? currentUser.email : "",
-        sellerPhone: currentUser ? currentUser.phone : "",
-        whatsapp: document.getElementById('pWhatsapp').value.replace('+', '').trim(),
-        telegram: document.getElementById('pTelegram').value.replace('@', '').trim(),
-        desc: document.getElementById('pDesc').value,
+      let rawWa = document.getElementById('prodWhatsapp').value.trim();
+      if (rawWa.startsWith('05')) rawWa = '966' + rawWa.substring(1);
+
+      const payload = {
+        title: document.getElementById('prodTitle').value.trim(),
+        price: document.getElementById('prodPrice').value.trim(),
+        seller: activeUser ? activeUser.name : "بائع معتمد",
+        sellerEmail: activeUser ? activeUser.email : "",
+        sellerPhone: activeUser ? activeUser.phone : "",
+        whatsapp: rawWa,
+        telegram: document.getElementById('prodTelegram').value.replace('@', '').trim(),
+        desc: document.getElementById('prodDesc').value.trim(),
         createdAt: new Date().toISOString()
       };
 
       try {
-        await fetch(`${DB_URL}/products.json`, {
+        await fetch(`${CLOUD_URL}/products.json`, {
           method: 'POST',
-          body: JSON.stringify(newP)
+          body: JSON.stringify(payload)
         });
-        btn.innerText = 'نشر الإعلان';
-        btn.disabled = false;
-        closeModal('productModal');
-        alert('تم نشر المنتج بنجاح وأصبح متاحاً للجميع على كل الأجهزة!');
-        loadCloudData();
+        hideModal('addModal');
+        alert('✅ تم نشر الإعلان بنجاح في السحابة!');
+        await syncCloudData();
       } catch (err) {
-        btn.innerText = 'نشر الإعلان';
+        alert('تعذر حفظ الإعلان، يرجى إعادة المحاولة.');
+      } finally {
         btn.disabled = false;
-        alert('تعذر حفظ الإعلان، يرجى المحاولة مرة أخرى.');
+        btn.innerText = 'نشر الإعلان فوراً';
       }
     }
 
-    function filterProducts() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = productsListGlobal.filter(p => p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
-      renderProducts(filtered);
+    // حذف منتج
+    async function deleteProductItem(id) {
+      if (!confirm("هل أنت متأكد من رغبتك في حذف هذا العرض نهائياً؟")) return;
+      try {
+        await fetch(`${CLOUD_URL}/products/${id}.json`, { method: 'DELETE' });
+        alert("تم حذف العرض بنجاح.");
+        await syncCloudData();
+      } catch (e) {
+        alert("حدث خطأ أثناء الحذف.");
+      }
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    // حظر بائع من كرت المنتج
+    async function banSellerDirectly(mail) {
+      if (!mail) return;
+      const target = loadedUsers.find(u => u.email && u.email.toLowerCase() === mail.toLowerCase());
+      if (!target) {
+        alert("تعذر العثور على الحساب السحابي للبائع.");
+        return;
+      }
+      if (confirm(`هل أنت متأكد من حظر البائع (${target.name})؟`)) {
+        await executeBan(target.id, true);
+      }
+    }
 
-    updateNav();
-    loadCloudData();
+    // لوحة تحكم المسؤولين
+    async function openAdminDashboard() {
+      if (!checkAdminStatus()) return;
+      await syncCloudData();
+
+      document.getElementById('addAdminContainer').style.display = isOwnerUser() ? 'block' : 'none';
+      const tbody = document.getElementById('adminTableContent');
+      tbody.innerHTML = '';
+
+      if (loadedUsers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94A3B8;">لا يوجد مستخدمين مسجلين في السحابة حالياً.</td></tr>`;
+      }
+
+      loadedUsers.forEach((u) => {
+        let isProtected = u.role === 'owner' || u.role === 'deputy' || (u.email && u.email.toLowerCase() === PRIMARY_OWNER);
+        let banBtn = isProtected ? `<span style="color:#64748B;">محمي (إدارة)</span>` : `
+          <button class="btn ${u.banned ? 'btn-success' : 'btn-danger'}" style="padding:4px 8px; font-size:0.75rem;" onclick="executeBan('${u.id}', ${!u.banned})">
+            ${u.banned ? 'فك الحظر' : 'حظر الحساب'}
+          </button>
+        `;
+
+        let roleBadge = u.role === 'seller' ? '<span style="color:#C084FC;">بائع</span>' : '<span style="color:#38BDF8;">عميل</span>';
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${u.name}</strong></td>
+            <td style="color:#FBBF24;">${u.phone || '-'}</td>
+            <td>${u.email}</td>
+            <td>${roleBadge}</td>
+            <td><span style="color:${u.banned ? '#EF4444' : '#10B981'}; font-weight:bold;">${u.banned ? 'محظور 🚫' : 'نشط ✅'}</span></td>
+            <td>${u.date || '-'}</td>
+            <td>${banBtn}</td>
+          </tr>
+        `;
+      });
+
+      showModal('adminModal');
+    }
+
+    async function executeBan(userId, state) {
+      if (!userId) return;
+      try {
+        await fetch(`${CLOUD_URL}/users/${userId}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ banned: state })
+        });
+        alert(state ? 'تم تطبيق الحظر بنجاح!' : 'تم فك الحظر بنجاح!');
+        await syncCloudData();
+        if (document.getElementById('adminModal').style.display === 'flex') {
+          openAdminDashboard();
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء تعديل حالة الحظر.');
+      }
+    }
+
+    async function promoteNewAdmin() {
+      const email = document.getElementById('newAdminMail').value.trim().toLowerCase();
+      if (!email) return;
+      if (!adminEmails.includes(email)) {
+        adminEmails.push(email);
+        await fetch(`${CLOUD_URL}/admins.json`, {
+          method: 'PUT',
+          body: JSON.stringify(adminEmails)
+        });
+        alert('تم إضافة الإداري بنجاح!');
+        document.getElementById('newAdminMail').value = '';
+      } else {
+        alert('هذا البريد مسجل كإداري بالفعل.');
+      }
+    }
+
+    function onSearchChange() {
+      const query = document.getElementById('searchBar').value.toLowerCase();
+      const filtered = loadedProducts.filter(p => 
+        (p.title && p.title.toLowerCase().includes(query)) || 
+        (p.desc && p.desc.toLowerCase().includes(query))
+      );
+      renderProductsList(filtered);
+    }
+
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // التشغيل الأولي
+    refreshNavigation();
+    syncCloudData();
   </script>
 </body>
 </html>
